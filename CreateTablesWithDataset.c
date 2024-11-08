@@ -269,12 +269,15 @@ void CreateProductsTable(char originFileName[]){
 
     while (fgets(line, sizeof(line), fpOrigin)){
         if(numberRecord != 0){
-            char *token = strtok(line, ","), temp[] = "";
+            char *token = strtok(line, ","), temp[200] = "";
             recordProduct.ProductKey = (unsigned short int) atoi(token);
 
-            token =strtok(NULL, ",");
+            token = strtok(NULL, ",");
             if(token[0] == '"'){
-
+                while (token[strlen(token) - 1] != '"'){
+                    strcat(token, strtok(NULL, ","));
+                }
+                strncpy(recordProduct.ProductName, token + 1, strlen(token));
             } else {
                 strcpy(recordProduct.ProductName, token);
             }
@@ -286,17 +289,26 @@ void CreateProductsTable(char originFileName[]){
             strcpy(recordProduct.Color, token);
 
             token = strtok(NULL, ",");
-            printf("%i\t%s\n", numberRecord, token);
             recordProduct.UnitCostUSD = atof(strncpy(temp, token + 1, strlen(token)));
 
             token = strtok(NULL, ",");
-            recordProduct.UnitPriceUSD = atof(strncpy(temp, token + 1, strlen(token)));
+            if(token[0] == '"'){
+                strcat(token, strtok(NULL, ","));
+                recordProduct.UnitPriceUSD = atof(strncpy(temp, token + 2, strlen(token)));
+            } else {
+                recordProduct.UnitPriceUSD = atof(strncpy(temp, token + 1, strlen(token)));
+            }
 
             token =strtok(NULL, ",");
             strcpy(recordProduct.SubcategoryKey, token);
 
             token =strtok(NULL, ",");
-            strcpy(recordProduct.Subcategory, token);
+            if(token[0] == '"'){
+                strcat(token, strtok(NULL, ","));
+                strncpy(recordProduct.Subcategory, token + 1, strlen(token) + 1);
+            } else {
+                strcpy(recordProduct.Subcategory, token);
+            }
 
             token =strtok(NULL, ",");
             strcpy(recordProduct.CategoryKey, token);
@@ -305,19 +317,19 @@ void CreateProductsTable(char originFileName[]){
             strcpy(recordProduct.Category, token);
 
             fwrite(&recordProduct, sizeof(recordProduct), 1, fpProduct);
-            /*
-            printf("Record : %i\n\n", numberRecord);
+            
+            printf("\nRecord : %i\n\n", numberRecord);
             printf("ProductKey    :%hu\n", recordProduct.ProductKey);
             printf("ProductName   :%s\n", recordProduct.ProductName);
-            printf("Brand         :%s\n", recordProduct.Brand);
-            printf("Color         :%s\n", recordProduct.Color);
+            //printf("Brand         :%s\n", recordProduct.Brand);
+            //printf("Color         :%s\n", recordProduct.Color);
             printf("UnitCostUSD   :%.2f\n", recordProduct.UnitCostUSD);
             printf("UnitPriceUSD  :%.2f\n", recordProduct.UnitPriceUSD);
-            printf("SubCategoryKey:%s\n", recordProduct.SubcategoryKey);
+            //printf("SubCategoryKey:%s\n", recordProduct.SubcategoryKey);
             printf("SubCategory   :%s\n", recordProduct.Subcategory);
-            printf("CategoryKey   :%s\n", recordProduct.CategoryKey);
-            printf("Category      :%s\n\n", recordProduct.Category);
-            */
+            //printf("CategoryKey   :%s\n", recordProduct.CategoryKey);
+            //printf("Category      :%s\n", recordProduct.Category);
+            
         }
         numberRecord++;
     }

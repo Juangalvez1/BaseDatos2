@@ -37,8 +37,8 @@ void ShowDateTime() {
 }
 
 void Printmenu() {
-    printf("\r\nCompany Global Electronics Retailer\n");
-    printf("of the menu\n");
+    printf("\nCompany Global Electronics Retailer\n");
+    printf("Options menu\n");
     printf("0. Exit Program\n");
     printf("1. Construction of the Database with the dataset tables\n");
     printf("2. List of %cWhat types of products does the company sell, and where are costumers located?\n", 168);
@@ -57,9 +57,9 @@ void Printmenu() {
 }
 
 void Option2(int sortType){
-    printf("\nCompany Global Rlectronics Retailer\n");
+    printf("\nCompany Global Electronics Retailer\n");
     ShowDateTime();
-    printf("Products list ordered by ProductName  + Continent + Country + Sate + City\n");
+    printf("Products list ordered by ProductName  + Continent + Country + State + City\n");
     
     if(sortType == 1){
         BubbleSortOption2();

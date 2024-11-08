@@ -101,5 +101,7 @@ int TellNumRecords(char fileName[], int recordSize) {
 }
 
 int main(){
-    printf("%f", atof(""));
+    char str[8] = "1345.45 ";
+    str[7] = 34;
+    printf("%s\t%f", str, atof(str));
 }
