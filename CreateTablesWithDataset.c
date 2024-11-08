@@ -278,6 +278,7 @@ void CreateProductsTable(char originFileName[]){
                     strcat(token, strtok(NULL, ","));
                 }
                 strncpy(recordProduct.ProductName, token + 1, strlen(token));
+                recordProduct.ProductName[strlen(recordProduct.ProductName) - 1] = '\0';
             } else {
                 strcpy(recordProduct.ProductName, token);
             }
@@ -305,7 +306,8 @@ void CreateProductsTable(char originFileName[]){
             token =strtok(NULL, ",");
             if(token[0] == '"'){
                 strcat(token, strtok(NULL, ","));
-                strncpy(recordProduct.Subcategory, token + 1, strlen(token) + 1);
+                strncpy(recordProduct.Subcategory, token + 1, strlen(token));
+                recordProduct.Subcategory[strlen(recordProduct.Subcategory) - 1] = '\0';
             } else {
                 strcpy(recordProduct.Subcategory, token);
             }
@@ -314,22 +316,28 @@ void CreateProductsTable(char originFileName[]){
             strcpy(recordProduct.CategoryKey, token);
 
             token =strtok(NULL, ",");
-            strcpy(recordProduct.Category, token);
+            if(token[0] == '"'){
+                strcat(token, strtok(NULL, ","));
+                strncpy(recordProduct.Category, token + 1, strlen(token));
+                recordProduct.Category[strlen(recordProduct.Category)] = '\0';
+            } else {
+                strcpy(recordProduct.Category, token);
+            }
 
             fwrite(&recordProduct, sizeof(recordProduct), 1, fpProduct);
-            
+            /*
             printf("\nRecord : %i\n\n", numberRecord);
             printf("ProductKey    :%hu\n", recordProduct.ProductKey);
             printf("ProductName   :%s\n", recordProduct.ProductName);
-            //printf("Brand         :%s\n", recordProduct.Brand);
-            //printf("Color         :%s\n", recordProduct.Color);
+            printf("Brand         :%s\n", recordProduct.Brand);
+            printf("Color         :%s\n", recordProduct.Color);
             printf("UnitCostUSD   :%.2f\n", recordProduct.UnitCostUSD);
             printf("UnitPriceUSD  :%.2f\n", recordProduct.UnitPriceUSD);
-            //printf("SubCategoryKey:%s\n", recordProduct.SubcategoryKey);
+            printf("SubCategoryKey:%s\n", recordProduct.SubcategoryKey);
             printf("SubCategory   :%s\n", recordProduct.Subcategory);
-            //printf("CategoryKey   :%s\n", recordProduct.CategoryKey);
-            //printf("Category      :%s\n", recordProduct.Category);
-            
+            printf("CategoryKey   :%s\n", recordProduct.CategoryKey);
+            printf("Category      :%s\n", recordProduct.Category);
+            */
         }
         numberRecord++;
     }

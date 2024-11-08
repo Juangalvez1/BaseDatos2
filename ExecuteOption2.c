@@ -48,16 +48,14 @@ void BubbleSortOption2(){
 		return;
 	}
 
-    int sizeProducts = 0;// sizeSales = 0, sizeCustomers = 0;
+    int sizeProducts = 0, sizeCustomers = 0, sizeSales = 0;
 
     sizeProducts = TellNumRecords("ProductsTable", sizeof(Products));
-    //sizeCustomers = TellNumRecords(CustomersTable", sizeof(Customers));
-    //sizeSales = TellNumRecords("SalesTable", sizeof(Sales));
-    printf("\n%i\n", sizeProducts);
-
+    sizeCustomers = TellNumRecords("CustomersTable", sizeof(Customers));
+    sizeSales = TellNumRecords("SalesTable", sizeof(Sales));
 
   	for ( int step = 0; step < sizeProducts - 1; step += 1 ){
-        printf("Llega %i\n", step + 1);
+        printf("1. Llega %i\n", step + 1);
     	for ( int i = 0; i < sizeProducts - step - 1; i += 1 ){
       		Products reg1, reg2;
 			fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
@@ -75,6 +73,27 @@ void BubbleSortOption2(){
       		}
         }
     }
+
+	for(int step = 0; step < sizeCustomers - 1; step += 1){
+		printf("2. Llega %i\n", step);
+		for(int i = 0; i < sizeCustomers - step - 1; i += 1){
+			Customers reg1, reg2;
+			fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
+      		fread(&reg1, sizeof(Customers), 1, fpCustomers);
+
+			fseek(fpCustomers, sizeof(Customers) * (i + 1), SEEK_SET);
+            fread(&reg2, sizeof(Customers), 1, fpCustomers);
+
+			if (reg1.CustomerKey > reg2.CustomerKey){
+				fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
+        		fwrite(&reg2, sizeof(Products), 1, fpProducts);
+
+				fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET);
+                fwrite(&reg1, sizeof(Products), 1, fpProducts);
+			} 
+			
+		}
+	}
 
     fclose(fpProducts);
     fclose(fpSales);

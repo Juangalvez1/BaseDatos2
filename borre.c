@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h> // Para sleep()
 
 /*
     Estructuras por archivo
@@ -101,7 +100,8 @@ int TellNumRecords(char fileName[], int recordSize) {
 }
 
 int main(){
-    char str[8] = "1345.45 ";
-    str[7] = 34;
-    printf("%s\t%f", str, atof(str));
+    char str[] = "hola", comilla [1] = "";
+    comilla[0] = 34;
+    strcat(str, comilla);
+    printf("%s\n", str);
 }
