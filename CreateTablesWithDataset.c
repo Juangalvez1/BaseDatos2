@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Tables.h"
 
 /*
     Estructuras por archivo
-*/
 
 //Sales Table
 typedef struct{
@@ -78,6 +78,26 @@ typedef struct{
     char Currency[3];
     float Exchange;
 } ExchangeRates;
+*/
+
+int TellNumRecords(char fileName[], int recordSize) {
+    FILE *fp = fopen(fileName, "rb"); // Abrir en modo binario
+    if (fp == NULL) {
+        return -1; // Retornar -1 en caso de error al abrir el archivo
+    }
+
+    fseek(fp, 0, SEEK_END); // Mover el puntero al final del archivo
+    long fileSize = ftell(fp); // Obtener el tamaño del archivo en bytes
+    fclose(fp);
+
+    // Calcular el número de registros
+    if (recordSize == 0) {
+        return -2; // Evitar división por cero
+    }
+    int numRecords = fileSize / recordSize;
+
+    return numRecords;
+}
 
 void CreateSalesTable(char originFileName[]){
     FILE *fpOrigin = fopen(originFileName, "r");
@@ -253,7 +273,11 @@ void CreateProductsTable(char originFileName[]){
             recordProduct.ProductKey = (unsigned short int) atoi(token);
 
             token =strtok(NULL, ",");
-            strcpy(recordProduct.ProductName, token);
+            if(token[0] == '"'){
+
+            } else {
+                strcpy(recordProduct.ProductName, token);
+            }
 
             token =strtok(NULL, ",");
             strcpy(recordProduct.Brand, token);
@@ -262,6 +286,7 @@ void CreateProductsTable(char originFileName[]){
             strcpy(recordProduct.Color, token);
 
             token = strtok(NULL, ",");
+            printf("%i\t%s\n", numberRecord, token);
             recordProduct.UnitCostUSD = atof(strncpy(temp, token + 1, strlen(token)));
 
             token = strtok(NULL, ",");
@@ -337,8 +362,8 @@ void CreateStoresTable(char originFileName[]){
             unsigned int day = 0, month = 0, year = 0;
             sscanf(token, "%u/%u/%u", &day, &month, &year);
             recordStore.OpenDate.DD = (unsigned char) day;
-            recordStore.OpenDate.DD = (unsigned char) month;
-            recordStore.OpenDate.DD = (unsigned short int) year;
+            recordStore.OpenDate.MM = (unsigned char) month;
+            recordStore.OpenDate.AAAA = (unsigned short int) year;
 
             fwrite(&recordStore, sizeof(recordStore), 1, fpStore);
             /*

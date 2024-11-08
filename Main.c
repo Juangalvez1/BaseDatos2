@@ -18,17 +18,21 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include "CreateTablesWithDataset.c"
 #include "ExecuteOption2.c"
 
-void ShowDateTime(char formattedTime[50]) {
+void ShowDateTime() {
     // Obtener el tiempo actual
     time_t current_time = time(NULL);
     struct tm *local_time = localtime(&current_time);
+    char formattedTime[50] = "";
 
     // Formatear la fecha y hora
     strftime(formattedTime, 50, "Valid to %Y-%b-%d at %H:%M hours", local_time);
+    printf("%s\n", formattedTime);
 
 }
 
@@ -53,20 +57,16 @@ void Printmenu() {
 }
 
 void Option2(int sortType){
-    char fechaHora[] = "";
-
     printf("\nCompany Global Rlectronics Retailer\n");
-    ShowDateTime(fechaHora);
-    printf("%s\n", fechaHora);
+    ShowDateTime();
     printf("Products list ordered by ProductName  + Continent + Country + Sate + City\n");
     
     if(sortType == 1){
         BubbleSortOption2();
     } else if (sortType == 2){
-        MergeSortOption2();
+        //MergeSortOption2();
     }
     
-
 }
 
 int main() {
@@ -104,6 +104,8 @@ int main() {
 
     } while(option != 0);
     
-    printf("\nBye");
+    printf("\nBye\n");
+
+    //system("Pause");
     return 0;
 }
