@@ -11,6 +11,8 @@
 
 #include<stdio.h>
 
+
+
 /*
 Función merge que sirve para unir los dos sub arrays
 - variable left que contiene el valor de la posición izquierda
@@ -72,7 +74,7 @@ Funcion MergeSort que será usado para dividir el array a la mitad
 void MergeSort(int left, int right, int array[]){
     if(left<right){
         //variable medium que guarda el valor de la posición de la mitad del array
-        int medium = left + (right - left) / 2;
+        int medium = left + ((right - left) / 2);
 
         //Volvemos a llamar a la función pero desde la izquierda hasta la mitad
         MergeSort(left, medium, array);

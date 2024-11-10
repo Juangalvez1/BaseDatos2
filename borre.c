@@ -112,6 +112,142 @@ void PrintExecutionTime(double time){
     printf("\n\n%s\n\n", totalTime);
 }
 
+int CompareByCustomerKey(void *a, void *b) {
+    Customers *custA = (Customers *)a;
+    Customers *custB = (Customers *)b;
+    return custA->CustomerKey - custB->CustomerKey;
+}
+
+int CompareByProductKey(void *a, void *b) {
+    Products *prodA = (Products *)a;
+    Products *prodB = (Products *)b;
+    return prodA->ProductKey - prodB->ProductKey;
+}
+
+int CompareBySalesProductKey(void *a, void *b){
+    Sales *saleA = (Sales *)a;
+    Sales *saleB = (Sales *)b;
+    return saleA->ProductKey - saleB->ProductKey;
+}
+
+int CompareByCustomerLocation(void *a, void*b){
+    int result = 0;
+    Customers *custA = (Customers *)a;
+    Customers *custB = (Customers *)b;
+
+    result = strcmp(custA->Continent, custB->Continent);
+    if(result != 0){
+        return result;
+    }
+
+    result = strcmp(custA->Country, custB->Country);
+    if(result != 0){
+        return result;
+    }
+
+    result = strcmp(custA->State, custB->State);
+    if(result != 0){
+        return result;
+    }
+
+    result = strcmp(custA->City, custB->City);
+    return result;
+
+}
+
+
+void Merge(void *array, int left, int right, int medium, int recordSize, int (*compare)(void*, void*)) {
+    int firstArray = medium - left + 1;
+    int secondArray = right - medium;
+    void *temporalLeft = malloc(firstArray * recordSize);
+    void *temporalRight = malloc(secondArray * recordSize);
+
+    // Copiar los valores de la primera mitad
+    for (int i = 0; i < firstArray; i++) {
+        memcpy((char*)temporalLeft + i * recordSize, (char*)array + (left + i) * recordSize, recordSize);
+    }
+
+    // Copiar los valores de la segunda mitad
+    for (int j = 0; j < secondArray; j++) {
+        memcpy((char*)temporalRight + j * recordSize, (char*)array + (medium + 1 + j) * recordSize, recordSize);
+    }
+
+    int i = 0, j = 0;
+    int posicion = left;
+
+    // Combinar los dos subarreglos de manera ordenada
+    while (i < firstArray && j < secondArray) {
+        if (compare((char*)temporalLeft + i * recordSize, (char*)temporalRight + j * recordSize) <= 0) {
+            memcpy((char*)array + posicion * recordSize, (char*)temporalLeft + i * recordSize, recordSize);
+            i++;
+        } else {
+            memcpy((char*)array + posicion * recordSize, (char*)temporalRight + j * recordSize, recordSize);
+            j++;
+        }
+        posicion++;
+    }
+
+    // Copiar los elementos restantes de temporalLeft
+    while (i < firstArray) {
+        memcpy((char*)array + posicion * recordSize, (char*)temporalLeft + i * recordSize, recordSize);
+        i++;
+        posicion++;
+    }
+
+    // Copiar los elementos restantes de temporalRight
+    while (j < secondArray) {
+        memcpy((char*)array + posicion * recordSize, (char*)temporalRight + j * recordSize, recordSize);
+        j++;
+        posicion++;
+    }
+
+    free(temporalLeft);
+    free(temporalRight);
+}
+
+// Función MergeSort que usa punteros void y funciones de comparación
+void MergeSort(void *array, int left, int right, int recordSize, int (*compare)(void*, void*)) {
+    if (left < right) {
+        int medium = left + ((right - left) / 2);
+
+        // Llamada recursiva para la primera mitad
+        MergeSort(array, left, medium, recordSize, compare);
+
+        // Llamada recursiva para la segunda mitad
+        MergeSort(array, medium + 1, right, recordSize, compare);
+
+        // Combina las dos mitades ordenadas
+        Merge(array, left, right, medium, recordSize, compare);
+
+        printf("Guarda en Array %i\n");
+    }
+}
+
+/*
+Funcion PrintArray que imprime todos los valores del array
+- variale size que guarda el tamaño del array
+- variable array que contiene los datos del array a imprimir
+*/
+void PrintArray(int size, int array[]){
+    for(int i = 0; i<size; i++){
+        printf("%i ", array[i]);
+    }
+    printf("\n");
+}
+/*
+int main(){
+    //variable array que tendrá el array a ajustar
+    int array[] = {3453, 4468, 4267, 132, 1634, 3748, 3263, 2436, 3456, 4566, 4567, 4566};
+    //variable size que contiene el tamaño del array
+    int size = sizeof(array)/sizeof(array[0]);
+    printf("Array desordenado: \n");
+    PrintArray(size, array);
+    printf("Array ordenado: \n");
+    MergeSort(0, size-1, array);
+    PrintArray(size, array);
+    return 0;
+}
+*/
 int main() {
     // Crear tabla de clientes de ejemplo
 
@@ -137,7 +273,7 @@ int main() {
         return 1;
     }
     
-    Customers *regs = (Customers *)malloc(sizeCustomers * sizeof(Customers));
+    Customers *regs = (Customers *)calloc(sizeCustomers, sizeof(Customers));
     // Leer los registros del archivo en el arreglo
     for (int i = 0; i < sizeCustomers; i++) {
         printf("Guarda en regs %i\n", i);
@@ -145,7 +281,9 @@ int main() {
         fread(&regs[i], sizeof(Customers), 1, fpCustomers);
     }
 
-    // Ordenar el arreglo en memoria
+    MergeSort(regs, 0, sizeCustomers - 1, sizeof(Customers), CompareByCustomerKey);
+
+    /*Ordenar el arreglo en memoria
     for (int step = 0; step < sizeCustomers - 1; step++) {
         printf("2. Llega %i\n", step + 1);
         for (int i = 0; i < sizeCustomers - step - 1; i++) {
@@ -157,7 +295,7 @@ int main() {
             }
         }
     }
-
+    */
     // Escribir los registros ordenados de vuelta al archivo
     
     for (int i = 0; i < sizeCustomers; i++) {

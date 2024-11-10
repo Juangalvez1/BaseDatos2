@@ -79,9 +79,10 @@ void Option2(int sortType){
     if(sortType == 1){
         BubbleSortOption2();
     } else if (sortType == 2){
-        //MergeSortOption2();
+        MergeSortOption2();
     }
-    
+    FILE *fp = fopen("TemporalFileOption2", "w");
+    fclose(fp);
 
     finish = clock();
 
