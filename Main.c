@@ -36,7 +36,18 @@ void ShowDateTime() {
 
 }
 
-void Printmenu() {
+void PrintExecutionTime(double time){
+    int minutes = 0, seconds = 0;
+    char totalTime[6] = "";
+
+    minutes = (int) time / 60;
+    seconds = (int) time % 60;
+
+    sprintf(totalTime, "%02d'%02d''", minutes, seconds);
+    printf("%s", totalTime);
+}
+
+void PrintMenu() {
     printf("\nCompany Global Electronics Retailer\n");
     printf("Options menu\n");
     printf("0. Exit Program\n");
@@ -57,6 +68,10 @@ void Printmenu() {
 }
 
 void Option2(int sortType){
+    int start = 0, finish = 0;
+    double totalSeconds = 0;
+    start = clock();
+
     printf("\nCompany Global Electronics Retailer\n");
     ShowDateTime();
     printf("Products list ordered by ProductName  + Continent + Country + State + City\n");
@@ -67,6 +82,15 @@ void Option2(int sortType){
         //MergeSortOption2();
     }
     
+
+    finish = clock();
+
+    totalSeconds = ((double)(finish - start)) / CLOCKS_PER_SEC;
+    
+    printf("\n---------------------------------------------------------------------------------------");
+    printf("\nTime used to produce this listing: "); 
+    PrintExecutionTime(totalSeconds);
+    printf("\n********************************LAST LINE OF THE REPORT********************************\n");
 }
 
 int main() {
@@ -74,7 +98,7 @@ int main() {
     printf("Welcome!\n");
 
     do {
-        Printmenu();
+        PrintMenu();
         scanf("%f", &option);
         option = (option * 10); //Necessary change in the user input to be able to compare it and know what he chosed
 

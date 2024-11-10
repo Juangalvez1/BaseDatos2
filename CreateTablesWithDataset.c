@@ -3,87 +3,10 @@
 #include <string.h>
 #include "Tables.h"
 
-/*
-    Estructuras por archivo
-
-//Sales Table
-typedef struct{
-    long int OrderNumber;
-    unsigned char LineItems;
-    struct{
-        unsigned char DD;
-        unsigned char MM;
-        unsigned short int AAAA;
-    } OrderDate;
-    struct{
-        unsigned char DD;
-        unsigned char MM;
-        unsigned short int AAAA;
-    } DeliveryDate;
-    unsigned int CustomerKey;
-    unsigned short int StoreKey;
-    unsigned short int ProductKey;
-    unsigned short int Quantity;
-    char CurrencyCode[3];
-} Sales;
-
-//Customers Table
-typedef struct{
-    unsigned int CustomerKey;
-    char Gender[8];
-    char Name[40];
-    char City[40];
-    char StateCode[30];
-    char State[30];
-    unsigned int ZipCode;
-    char Country[20];
-    char Continent[20];
-    struct{
-        unsigned char DD;
-        unsigned char MM;
-        unsigned short int AAAA;
-    } Birthday;
-} Customers;
-
-//Products Table
-typedef struct{
-    unsigned short int ProductKey;
-    char ProductName[100];
-    char Brand[30];
-    char Color[15];
-    float UnitCostUSD;
-    float UnitPriceUSD;
-    char SubcategoryKey[5];
-    char Subcategory[50];
-    char CategoryKey[3];
-    char Category[20];
-} Products;
-
-//Stores Table
-typedef struct{
-    unsigned short int StoreKey;
-    char Country[35];
-    char State[35];
-    unsigned short int SquareMeters;
-    struct{
-        unsigned char DD;
-        unsigned char MM;
-        unsigned short int AAAA;
-    } OpenDate;
-} Stores;
-
-//ExchangeRates Table
-typedef struct{
-    char Date[11];
-    char Currency[3];
-    float Exchange;
-} ExchangeRates;
-*/
-
 int TellNumRecords(char fileName[], int recordSize) {
     FILE *fp = fopen(fileName, "rb"); // Abrir en modo binario
     if (fp == NULL) {
-        return -1; // Retornar -1 en caso de error al abrir el archivo
+        return 0; // Retornar -1 en caso de error al abrir el archivo
     }
 
     fseek(fp, 0, SEEK_END); // Mover el puntero al final del archivo
@@ -92,7 +15,7 @@ int TellNumRecords(char fileName[], int recordSize) {
 
     // Calcular el número de registros
     if (recordSize == 0) {
-        return -2; // Evitar división por cero
+        return 0; // Evitar división por cero
     }
     int numRecords = fileSize / recordSize;
 
@@ -124,20 +47,20 @@ void CreateSalesTable(char originFileName[]){
         
         token = strtok(NULL, ",");
         unsigned int day = 0, month = 0, year = 0;
-        sscanf(token, "%u/%u/%u", &day, &month, &year);
-        recordSales.OrderDate.DD = (unsigned char) day;
+        sscanf(token, "%u/%u/%u", &month, &day, &year);
         recordSales.OrderDate.MM = (unsigned char) month;
+        recordSales.OrderDate.DD = (unsigned char) day;
         recordSales.OrderDate.AAAA = (unsigned short int) year;
         
         token = strtok(NULL, ",");
         if (token[0] == ' '){
-            recordSales.DeliveryDate.DD = 0;
             recordSales.DeliveryDate.MM = 0;
+            recordSales.DeliveryDate.DD = 0;
             recordSales.DeliveryDate.AAAA = 0;
         } else {
-            sscanf(token, "%u/%u/%u", &day, &month, &year);
-            recordSales.DeliveryDate.DD = (unsigned char) day;
+            sscanf(token, "%u/%u/%u", &month, &day, &year);
             recordSales.DeliveryDate.MM = (unsigned char) month;
+            recordSales.DeliveryDate.DD = (unsigned char) day;
             recordSales.DeliveryDate.AAAA = (unsigned short int) year;
         }
         
@@ -161,8 +84,8 @@ void CreateSalesTable(char originFileName[]){
         printf("Record: %i\n\n",numberRecord);
         printf("OrderNumber :%ld\n", recordSales.OrderNumber);
         printf("LineItem    :%u\n", recordSales.LineItems);
-        printf("OrderDate   :%u/%u/%hu\n", recordSales.OrderDate.DD, recordSales.OrderDate.MM, recordSales.OrderDate.AAAA);
-        printf("DeliveryDate:%u/%u/%hu\n", recordSales.DeliveryDate.DD, recordSales.DeliveryDate.MM, recordSales.DeliveryDate.AAAA);
+        printf("OrderDate   :%u/%u/%hu\n", recordSales.OrderDate.MM, recordSales.OrderDate.DD, recordSales.OrderDate.AAAA);
+        printf("DeliveryDate:%u/%u/%hu\n", recordSales.DeliveryDate.MM, recordSales.DeliveryDate.DD, recordSales.DeliveryDate.AAAA);
         printf("CustomerKey :%u\n", recordSales.CustomerKey);
         printf("StoreKey    :%hu\n", recordSales.StoreKey);
         printf("ProductKey  :%hu\n", recordSales.ProductKey);
@@ -225,9 +148,9 @@ void CreateCustomersTable(char originFileName[]){
 
             token = strtok(NULL, ";");
             unsigned int day = 0, month = 0, year = 0;
-            sscanf(token, "%u/%u/%u", &day, &month, &year);
-            recordCustomer.Birthday.DD = (unsigned char) day;
+            sscanf(token, "%u/%u/%u", &month, &day, &year);
             recordCustomer.Birthday.MM = (unsigned char) month;
+            recordCustomer.Birthday.DD = (unsigned char) day;
             recordCustomer.Birthday.AAAA = (unsigned short int) year;
 
             fwrite(&recordCustomer, sizeof(recordCustomer), 1, fpCustomer);
@@ -242,7 +165,7 @@ void CreateCustomersTable(char originFileName[]){
             printf("ZipCode    :%u\n", recordCustomer.ZipCode);
             printf("Country    :%s\n", recordCustomer.Country);
             printf("Continent  :%s\n", recordCustomer.Continent);
-            printf("Birthday   :%u/%u/%hu\n\n", recordCustomer.Birthday.DD, recordCustomer.Birthday.MM, recordCustomer.Birthday.AAAA);
+            printf("Birthday   :%u/%u/%hu\n\n", recordCustomer.Birthday.MM, recordCustomer.Birthday.DD, recordCustomer.Birthday.AAAA);
             */
         }
         numberRecord++;
@@ -283,14 +206,19 @@ void CreateProductsTable(char originFileName[]){
                 strcpy(recordProduct.ProductName, token);
             }
 
-            token =strtok(NULL, ",");
+            token = strtok(NULL, ",");
             strcpy(recordProduct.Brand, token);
 
-            token =strtok(NULL, ",");
+            token = strtok(NULL, ",");
             strcpy(recordProduct.Color, token);
 
             token = strtok(NULL, ",");
-            recordProduct.UnitCostUSD = atof(strncpy(temp, token + 1, strlen(token)));
+            if(token[0] == '"'){
+                strcat(token, strtok(NULL, ","));
+                recordProduct.UnitCostUSD = atof(strncpy(temp, token + 2, strlen(token)));
+            } else {
+                recordProduct.UnitCostUSD = atof(strncpy(temp, token + 1, strlen(token)));
+            }
 
             token = strtok(NULL, ",");
             if(token[0] == '"'){
@@ -300,10 +228,10 @@ void CreateProductsTable(char originFileName[]){
                 recordProduct.UnitPriceUSD = atof(strncpy(temp, token + 1, strlen(token)));
             }
 
-            token =strtok(NULL, ",");
+            token = strtok(NULL, ",");
             strcpy(recordProduct.SubcategoryKey, token);
 
-            token =strtok(NULL, ",");
+            token = strtok(NULL, ",");
             if(token[0] == '"'){
                 strcat(token, strtok(NULL, ","));
                 strncpy(recordProduct.Subcategory, token + 1, strlen(token));
@@ -312,14 +240,14 @@ void CreateProductsTable(char originFileName[]){
                 strcpy(recordProduct.Subcategory, token);
             }
 
-            token =strtok(NULL, ",");
+            token = strtok(NULL, ",");
             strcpy(recordProduct.CategoryKey, token);
 
-            token =strtok(NULL, ",");
+            token = strtok(NULL, ",");
             if(token[0] == '"'){
                 strcat(token, strtok(NULL, ","));
                 strncpy(recordProduct.Category, token + 1, strlen(token));
-                recordProduct.Category[strlen(recordProduct.Category)] = '\0';
+                recordProduct.Category[strlen(recordProduct.Category) - 1] = '\0';
             } else {
                 strcpy(recordProduct.Category, token);
             }
@@ -380,9 +308,9 @@ void CreateStoresTable(char originFileName[]){
                 token = strtok(NULL, ",");
             }
             unsigned int day = 0, month = 0, year = 0;
-            sscanf(token, "%u/%u/%u", &day, &month, &year);
-            recordStore.OpenDate.DD = (unsigned char) day;
+            sscanf(token, "%u/%u/%u", &month, &day, &year);
             recordStore.OpenDate.MM = (unsigned char) month;
+            recordStore.OpenDate.DD = (unsigned char) day;
             recordStore.OpenDate.AAAA = (unsigned short int) year;
 
             fwrite(&recordStore, sizeof(recordStore), 1, fpStore);

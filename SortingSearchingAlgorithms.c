@@ -12,13 +12,13 @@
 #include<stdio.h>
 #include<string.h>
 
-/*
+
 typedef struct {
     int id;
     char nom[20];
     char lastName[35];
 } registro;
-*/
+
 /*
 Función merge que sirve para unir los dos sub arrays en un archivo
 - variable left que contiene el valor de la posición izquierda

@@ -8,13 +8,13 @@ typedef struct {
     long int OrderNumber;
     unsigned char LineItems;
     struct {
-        unsigned char DD;
         unsigned char MM;
+        unsigned char DD;
         unsigned short int AAAA;
     } OrderDate;
     struct {
-        unsigned char DD;
         unsigned char MM;
+        unsigned char DD;
         unsigned short int AAAA;
     } DeliveryDate;
     unsigned int CustomerKey;
@@ -35,8 +35,8 @@ typedef struct {
     char Country[20];
     char Continent[20];
     struct {
-        unsigned char DD;
         unsigned char MM;
+        unsigned char DD;
         unsigned short int AAAA;
     } Birthday;
 } Customers;
@@ -51,7 +51,7 @@ typedef struct {
     char SubcategoryKey[5];
     char Subcategory[50];
     char CategoryKey[3];
-    char Category[20];
+    char Category[35];
 } Products;
 
 typedef struct {
@@ -60,8 +60,8 @@ typedef struct {
     char State[35];
     unsigned short int SquareMeters;
     struct {
-        unsigned char DD;
         unsigned char MM;
+        unsigned char DD;
         unsigned short int AAAA;
     } OpenDate;
 } Stores;

@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "CreateTablesWithDataset.c"
 
 /*
     Estructuras por archivo
-*/
+
 
 //Sales Table
 typedef struct{
@@ -98,10 +99,80 @@ int TellNumRecords(char fileName[], int recordSize) {
 
     return numRecords;
 }
+*/
 
-int main(){
-    char str[] = "hola", comilla [1] = "";
-    comilla[0] = 34;
-    strcat(str, comilla);
-    printf("%s\n", str);
+void PrintExecutionTime(double time){
+    int minutes = 0, seconds = 0;
+    char totalTime[6] = "";
+
+    minutes = (int) time / 60;
+    seconds = (int) time % 60;
+
+    sprintf(totalTime, "%02d'%02d''", minutes, seconds);
+    printf("\n\n%s\n\n", totalTime);
+}
+
+int main() {
+    // Crear tabla de clientes de ejemplo
+
+    int start = 0, finish = 0;
+    double totalSeconds = 0;
+    start = clock();
+
+
+    CreateCustomersTable("Customers.csv");
+
+    // Determinar el tamaño del arreglo basado en el archivo
+    int sizeCustomers = TellNumRecords("CustomersTable", sizeof(Customers));
+    printf("LLega - Registros a leer: %d\n", sizeCustomers);
+
+    if (sizeCustomers == 0) {
+        printf("No hay registros en el archivo.\n");
+        return 1;
+    }
+
+    FILE *fpCustomers = fopen("CustomersTable", "rb+");
+    if (fpCustomers == NULL) {
+        printf("Error al abrir el archivo para lectura/escritura.\n");
+        return 1;
+    }
+    
+    Customers *regs = (Customers *)malloc(sizeCustomers * sizeof(Customers));
+    // Leer los registros del archivo en el arreglo
+    for (int i = 0; i < sizeCustomers; i++) {
+        printf("Guarda en regs %i\n", i);
+        fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
+        fread(&regs[i], sizeof(Customers), 1, fpCustomers);
+    }
+
+    // Ordenar el arreglo en memoria
+    for (int step = 0; step < sizeCustomers - 1; step++) {
+        printf("2. Llega %i\n", step + 1);
+        for (int i = 0; i < sizeCustomers - step - 1; i++) {
+            if (regs[i].CustomerKey > regs[i + 1].CustomerKey) {
+                // Intercambiar registros
+                Customers temp = regs[i];
+                regs[i] = regs[i + 1];
+                regs[i + 1] = temp;
+            }
+        }
+    }
+
+    // Escribir los registros ordenados de vuelta al archivo
+    
+    for (int i = 0; i < sizeCustomers; i++) {
+        printf("Guarda en archivo %i\n", i + 1);
+        fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
+        fwrite(&regs[i], sizeof(Customers), 1, fpCustomers);
+    }
+
+    finish = clock();
+
+    totalSeconds = ((double)(finish - start)) / CLOCKS_PER_SEC;
+
+    PrintExecutionTime(totalSeconds);
+
+    free(regs);
+    fclose(fpCustomers);
+    return 0;
 }
