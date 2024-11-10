@@ -199,30 +199,36 @@ int BubbleSortSales(char fileName[], int numRecordsSales){
 	return 1;
 }
 
-void DeterminatedCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCustomers, int numOfProducts){
-  	Products recordProduct;
-	Customers recordCustomer;
-	Sales recordSale;
+void DeterminatedCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCustomers, int numOfProducts, int typeofSort){
+  	Products recordProduct;		//Used to store a record of ProductsTable and get its information
+	Customers recordCustomer;	//Used to store a record of CustomersTable and store it temporarely in TemporalFileOption2
+	Sales recordSale;			//Used to store a record of SalesTable and get its information
 
-	char productName[100] = "";
-	unsigned short int productKey = 0;
-	unsigned int customerKey = 0;
+	char productName[100] = ""; 		//Used to store the ProductName of each Product in ProductsTable
+	unsigned short int productKey = 0; 	//Used to store the ProductKey of each Product in ProductTable
+	unsigned int customerKey = 0;		//Used to store the Customer key of a customer which has bougth a Product
 
+	//For to loop all of the Products and search if they have any sales reported
 	for(int i = 0; i < numOfProducts; i++){
+		//Reading and storage of the Product[i] in ProductsTable
     	fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
     	fread(&recordProduct, sizeof(recordProduct), 1, fpProducts);
 
+		//Copy into productName the ProductName of each product and display it
     	strcpy(productName, recordProduct.ProductName);
     	printf("\n%s", productName);
 
+		//Getting the current ProductKey to do the searchs and comparations
 		productKey = recordProduct.ProductKey;
 
+		//Getting the "Position" of a sale with the current productKey, it may not be the first one
     	int positionSales = BinarySearch(fpSales, productKey, 3);
 
     	if( positionSales == -1){
     		printf(" - No sales reported\n");
     	} else {
-    		FILE *fpTemporal = fopen("TemporalFileOption2", "wb+");
+			//TemporalFile, will be used for each product to store te record of the customers who have bougth it
+			FILE *fpTemporal = fopen("TemporalFileOption2", "wb+");
 			if (fpTemporal == NULL) {
 			    printf("Error abriendo archivo temporal.\n");
 			    return;
@@ -231,39 +237,53 @@ void DeterminatedCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCust
     	    printf("\n%-35s %-35s %-35s %-35s\n", "Continent", "Country", "State", "City");
     	    printf("_______________________________________________________________________________________________________________________________________\n");
 
+			//Reading the record in sales with the current product key
     	    fseek(fpSales, sizeof(Sales) * (positionSales - 1), SEEK_SET);
     	    fread(&recordSale, sizeof(Sales), 1, fpSales);
 
+			//for to loop and check if the recordSale[positionSales] is the first record in sales with the currrent productkey
     	    for( int i = positionSales - 1; i >= 0 && productKey == recordSale.ProductKey; i -= 1){
+				//Reading of the previous record in sales to verify if its the first one with the currenr productKey
     	    	fseek(fpSales, sizeof(Sales) * (i - 1), SEEK_SET);
     	    	fread(&recordSale, sizeof(Sales), 1, fpSales);
 
-    	    	positionSales = i;
+    	    	positionSales = i; //Changing positionSales to be the index of first record in sales with the current productKey
     	    }
 
+			//Reading the first record in sales with the current ProductKey
 			fseek(fpSales, sizeof(Sales) * positionSales, SEEK_SET);
 			fread(&recordSale, sizeof(Sales), 1, fpSales);
 
+			/*
+			index: will be the positionSales, to get each sale with the current productKey
+			numOfBuyers: num of people that has bougth the current product, will be the amount of records in TemporalFileOption2
+			positionCustomers: index of CustomersTable of the customerKey of each customer that has bougth the current product 
+			*/
 			int index = positionSales, numOfBuyers = 0, positionCustomers = 0;
+
+			//While to store each customer that has bougth the current product into TemporalFileOption2
+			//It will loop till the productKey its a different one or it reached the end of the SalesTable file
     	    while (recordSale.ProductKey == productKey && index <= 66283){
 				customerKey = recordSale.CustomerKey;
 
+				//Getting the position in CustomersTable of each customer that has bougth the current product
 				positionCustomers = BinarySearch(fpCustomers, customerKey, 2);
 
 				if (positionCustomers != -1) {
+					//Reading the record[positionCustomers] 
                     fseek(fpCustomers, sizeof(Customers) * positionCustomers, SEEK_SET);
                     fread(&recordCustomer, sizeof(Customers), 1, fpCustomers);
-
+					//writing the recordCsutomer in the TemporalFileOption2
                     fwrite(&recordCustomer, sizeof(Customers), 1, fpTemporal);
                     numOfBuyers++;
                 }
-
+				//Reading the next recordSale to veridy if its about the same product
 				fseek(fpSales, sizeof(Sales) * (index + 1), SEEK_SET);
 				fread(&recordSale, sizeof(Sales), 1, fpSales);
 
 				index++;
 			}
-			
+			//Creating the pointer to the part of tha dinamic memory where the records of TemporalFileOption2 will be temporarely saved
 			Customers *recordsCustomers = (Customers *) calloc(numOfBuyers, sizeof(Customers));
 
 			//For to store the records of CustomersTable in the "array" of Customers
@@ -273,43 +293,54 @@ void DeterminatedCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCust
 				fread(&recordsCustomers[i], sizeof(Customers), 1, fpTemporal);
 			}
 		
-			//For to sort Customers
-  			for ( int step = 0; step < numOfBuyers - 1; step += 1 ){
-				//printf("\nSort Customers %i", step + 1);
-    			for ( int i = 0; i < numOfBuyers - step - 1; i += 1 ){
+			int comparation = 0;
+			if(typeofSort == 1){ //Executing option 2.1
+				//For to sort Customers
+  				for ( int step = 0; step < numOfBuyers - 1; step += 1 ){
+					//printf("\nSort Customers %i", step + 1);
+    				for ( int i = 0; i < numOfBuyers - step - 1; i += 1 ){
 
-					int comparation = strcmp(recordsCustomers[i].Continent, recordsCustomers[i + 1].Continent);
-    		  		if (comparation > 0){
-						Customers temp = recordsCustomers[i]; //Temporal variable to exchange the records
-						recordsCustomers[i] = recordsCustomers[i + 1];
-						recordsCustomers[i + 1] = temp;
-    		  		} else if(comparation == 0){
-
-						comparation = strcmp(recordsCustomers[i].Country, recordsCustomers[i + 1].Country);
-						if (comparation > 0){
+						comparation = strcmp(recordsCustomers[i].Continent, recordsCustomers[i + 1].Continent);
+    			  		if (comparation > 0){
 							Customers temp = recordsCustomers[i]; //Temporal variable to exchange the records
 							recordsCustomers[i] = recordsCustomers[i + 1];
 							recordsCustomers[i + 1] = temp;
-						} else if (comparation == 0){
 
-							comparation = strcmp(recordsCustomers[i].State, recordsCustomers[i + 1].State);
+						//Compare if the continents are equal
+    			  		} else if(comparation == 0){
+
+							comparation = strcmp(recordsCustomers[i].Country, recordsCustomers[i + 1].Country);
 							if (comparation > 0){
 								Customers temp = recordsCustomers[i]; //Temporal variable to exchange the records
 								recordsCustomers[i] = recordsCustomers[i + 1];
 								recordsCustomers[i + 1] = temp;
+
+							//Compare if the countries are equal
 							} else if (comparation == 0){
 
-								comparation = strcmp(recordsCustomers[i].City, recordsCustomers[i + 1].City);
+								comparation = strcmp(recordsCustomers[i].State, recordsCustomers[i + 1].State);
 								if (comparation > 0){
 									Customers temp = recordsCustomers[i]; //Temporal variable to exchange the records
 									recordsCustomers[i] = recordsCustomers[i + 1];
 									recordsCustomers[i + 1] = temp;
+
+								//Compare if the States are equal
+								} else if (comparation == 0){
+
+									comparation = strcmp(recordsCustomers[i].City, recordsCustomers[i + 1].City);
+									if (comparation > 0){
+										Customers temp = recordsCustomers[i]; //Temporal variable to exchange the records
+										recordsCustomers[i] = recordsCustomers[i + 1];
+										recordsCustomers[i + 1] = temp;
+									}
 								}
 							}
 						}
-					}
-    		    }
-    		}
+    			    }
+    			}
+			} else if (typeofSort == 2){ //Executing option 2.2
+
+			}
 		
 			//For to write each record alredy ordered in the file CustomersTable
 			for (int i = 0; i < numOfBuyers; i += 1){
@@ -318,13 +349,14 @@ void DeterminatedCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCust
 				fwrite(&recordsCustomers[i], sizeof(Customers), 1, fpTemporal);
 			}
 
-
+			//For to display each location of the customers that have bougth the current product
 			for(int i  = 0; i < numOfBuyers ; i++){
 				fseek(fpTemporal, sizeof(Customers) * i, SEEK_SET);
 				fread(&recordCustomer, sizeof(Customers), 1, fpTemporal);
 
 				printf("%-35s %-35s %-35s %-35s\n", recordCustomer.Continent, recordCustomer.Country, recordCustomer.State, recordCustomer.City);
 			}
+
 			fclose(fpTemporal);
 			free(recordsCustomers);
 			recordsCustomers = NULL;
@@ -337,15 +369,29 @@ void BubbleSortOption2(){
 	int numRecordsCustomers = TellNumRecords("CustomersTable", sizeof(Customers)); //Quantity of products in CustomersTable
 	int numRecordsSales = TellNumRecords("SalesTable", sizeof(Sales)); //Quantity of products in SalesTable
 
-	BubbleSortProducts("ProductsTable", numRecordsProducts);
-	BubbleSortCustomers("CustomersTable", numRecordsCustomers);
-	BubbleSortSales("SalesTable", numRecordsSales);
+	BubbleSortProducts("ProductsTable", numRecordsProducts);	//To BubbleSort the ProductsTable File
+	BubbleSortCustomers("CustomersTable", numRecordsCustomers);	//To BubbleSort the CustomersTable File
+	BubbleSortSales("SalesTable", numRecordsSales);				//To BubbleSort the SalesTable File
 
 	FILE *fpProducts = fopen("ProductsTable", "rb+");	//Pointer to ProductsTable
     FILE *fpCustomers = fopen("CustomersTable", "rb+");	//Pointer to CustomersTable
     FILE *fpSales = fopen("SalesTable", "rb+");			//Pointer to SalesTable	
 
-	DeterminatedCustomersLocation(fpProducts, fpSales, fpCustomers, numRecordsProducts);
+	if (fpProducts == NULL){
+		printf("Error opening the 'ProductsTable' File");
+		return;
+	}
+	if (fpCustomers == NULL){
+		printf("Error opening the 'CustomersTable' File");
+		return;
+	}
+	if (fpSales == NULL){
+		printf("Error opening the 'SalesTable' File");
+		return;
+	}
+	
+
+	DeterminatedCustomersLocation(fpProducts, fpSales, fpCustomers, numRecordsProducts, 1);
 
     fclose(fpProducts);
     fclose(fpSales);
@@ -353,13 +399,30 @@ void BubbleSortOption2(){
 }
 
 void MergeSortOption2(){
+	int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); //Quantity of products in ProductsTable
+	int numRecordsCustomers = TellNumRecords("CustomersTable", sizeof(Customers)); //Quantity of products in CustomersTable
+	int numRecordsSales = TellNumRecords("SalesTable", sizeof(Sales)); //Quantity of products in SalesTable
+
     FILE *fpProducts = fopen("ProductsTable", "rb+");
     FILE *fpSales = fopen("SalesTable", "rb+");
     FILE *fpCustomers = fopen("CustomersTable", "rb+");
 
-    //Products recordProduct;
-    //Sales recordSale;
-    //Customers recordCustomer;
+	if (fpProducts == NULL){
+		printf("Error opening the 'ProductsTable' File");
+		return;
+	}
+	if (fpCustomers == NULL){
+		printf("Error opening the 'CustomersTable' File");
+		return;
+	}
+	if (fpSales == NULL){
+		printf("Error opening the 'SalesTable' File");
+		return;
+	}
+
+	MergeSortProducts();
+	MergeSortCustomers();
+	MergeSortSales();
 
     fclose(fpProducts);
     fclose(fpSales);
