@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "CreateTablesWithDataset.c"
+#include "Functions.c"
 #include "ExecuteOption2.c"
 
 void ShowDateTime() {
@@ -69,9 +69,9 @@ void PrintMenu() {
 
 void Option2(int sortType){
     int start = 0, finish = 0;
-    double totalSeconds = 0;
+    double totalSeconds = 0.;
     start = clock();
-
+    printf("\n---------------------------------------------------------------------------------------");
     printf("\nCompany Global Electronics Retailer\n");
     ShowDateTime();
     printf("Products list ordered by ProductName  + Continent + Country + State + City\n");
@@ -104,7 +104,7 @@ int main() {
         option = (option * 10); //Necessary change in the user input to be able to compare it and know what he chosed
 
         if (option == 10) {                             // Execute option 1 of the menu
-            CreateDatasetTables();
+            CreateTablesWithDataset();
             printf("\nTables Created Succesfully\n");
         } else if (option == 21) {                      // Execute option 2.1 of the menu
             Option2(1);

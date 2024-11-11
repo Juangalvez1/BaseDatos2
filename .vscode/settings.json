@@ -2,6 +2,8 @@
     "files.associations": {
         "random": "c",
         "limits": "c",
-        "MergeSortArray.C": "cpp"
+        "MergeSortArray.C": "cpp",
+        "tables.h": "c",
+        "functions.h": "c"
     }
 }

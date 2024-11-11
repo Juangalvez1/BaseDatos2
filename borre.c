@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "CreateTablesWithDataset.c"
+#include "Functions.c"
 
 /*
     Estructuras por archivo
@@ -136,7 +136,7 @@ int CompareByCustomerLocation(void *a, void*b){
     Customers *custB = (Customers *)b;
 
     result = strcmp(custA->Continent, custB->Continent);
-    if(result != 0){
+    if(result != 0){ 
         return result;
     }
 
@@ -159,8 +159,8 @@ int CompareByCustomerLocation(void *a, void*b){
 void Merge(void *array, int left, int right, int medium, int recordSize, int (*compare)(void*, void*)) {
     int firstArray = medium - left + 1;
     int secondArray = right - medium;
-    void *temporalLeft = malloc(firstArray * recordSize);
-    void *temporalRight = malloc(secondArray * recordSize);
+    void *temporalLeft = calloc(firstArray, recordSize);
+    void *temporalRight = calloc(secondArray, recordSize);
 
     // Copiar los valores de la primera mitad
     for (int i = 0; i < firstArray; i++) {
@@ -219,7 +219,7 @@ void MergeSort(void *array, int left, int right, int recordSize, int (*compare)(
         // Combina las dos mitades ordenadas
         Merge(array, left, right, medium, recordSize, compare);
 
-        printf("Guarda en Array %i\n");
+        //printf("Guarda en Array %i\n");
     }
 }
 

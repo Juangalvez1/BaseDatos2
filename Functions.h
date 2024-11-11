@@ -1,5 +1,5 @@
-#ifndef TABLES_H
-#define TABLES_H
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
 
 #include <stdio.h>
 
@@ -73,7 +73,9 @@ typedef struct {
 } ExchangeRates;
 
 // Declaraciones de funciones
+
 int TellNumRecords(char fileName[], int recordSize);
+
 void CreateSalesTable(char originFileName[]);
 void CreateCustomersTable(char originFileName[]);
 void CreateProductsTable(char originFileName[]);
@@ -81,4 +83,14 @@ void CreateStoresTable(char originFileName[]);
 void CreateExchangeRatesTable(char originFileName[]);
 void CreateDatasetTables();
 
-#endif // TABLES_H
+int BinarySearch(FILE *fp, unsigned int valueToSearch, int file);
+
+int CompareCustomersByCustomerKey(void *a, void *b);
+int CompareProductsByProductName(void *a, void *b);
+int CompareSalesByProductKey(void *a, void *b);
+int CompareCustomersByCustomerLocation(void *a, void*b);
+
+void Merge(void *array, int left, int right, int medium, int recordSize, int (*compare)(void*, void*));
+void MergeSort(void *array, int left, int right, int recordSize, int (*compare)(void*, void*));
+
+#endif // FUNCTIONS_H
