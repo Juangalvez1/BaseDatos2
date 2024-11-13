@@ -81,6 +81,7 @@ void Option2(int sortType){
     } else if (sortType == 2){
         MergeSortOption2();
     }
+
     FILE *fp = fopen("TemporalFileOption2", "w");
     fclose(fp);
 
@@ -95,6 +96,7 @@ void Option2(int sortType){
 }
 
 int main() {
+    int creationOfTables = 0;
     float option = 0.;
     printf("Welcome!\n");
 
@@ -103,30 +105,30 @@ int main() {
         scanf("%f", &option);
         option = (option * 10); //Necessary change in the user input to be able to compare it and know what he chosed
 
-        if (option == 10) {                             // Execute option 1 of the menu
+        if (option == 10) {                                     // Execute option 1 of the menu
             CreateTablesWithDataset();
-            printf("\nTables Created Succesfully\n");
-        } else if (option == 21) {                      // Execute option 2.1 of the menu
+            creationOfTables++;
+        } else if (option == 21 && creationOfTables) {      // Execute option 2.1 of the menu
             Option2(1);
-        } else if (option == 22) {                      // Execute option 2.2 of the menu
+        } else if (option == 22 && creationOfTables) {      // Execute option 2.2 of the menu
             Option2(2);
-        } else if (option == 31) {                      // Execute option 3.1 of the menu
+        } else if (option == 31 && creationOfTables) {      // Execute option 3.1 of the menu
             printf("Executing option 3.1\n");
-        } else if (option == 32) {                      // Execute option 3.2 of the menu
+        } else if (option == 32 && creationOfTables) {      // Execute option 3.2 of the menu
             printf("Executing option 3.2\n");
-        } else if (option == 41) {                      // Execute option 4.1 of the menu
+        } else if (option == 41 && creationOfTables) {      // Execute option 4.1 of the menu
             printf("Executing option 4.1\n");
-        } else if (option == 42) {                      // Execute option 4.2 of the menu
+        } else if (option == 42 && creationOfTables) {      // Execute option 4.2 of the menu
             printf("Executing option 4.2\n");
-        } else if (option == 51) {                      // Execute option 5.1 of the menu
+        } else if (option == 51 && creationOfTables) {      // Execute option 5.1 of the menu
             printf("Executing option 5.1\n");
-        } else if (option == 52) {                      // Execute option 5.2 of the menu
+        } else if (option == 52 && creationOfTables) {      // Execute option 5.2 of the menu
             printf("Executing option 5.2\n");
-        } else if (option == 0) {                       // Execute option 0 of the menu
+        } else if (option == 0) {                           // Execute option 0 of the menu
             printf("Exiting the program...\n");
-        } else                                          // Invalid Input
+        } else {                                            // Invalid Input
             printf("Invalid option. Please try again.\n");
-
+        }
     } while(option != 0);
     
     printf("\nBye\n");

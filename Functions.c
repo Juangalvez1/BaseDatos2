@@ -5,7 +5,7 @@
 #include "Functions.h"
 
 
-int TellNumRecords(char fileName[], int recordSize) {
+int TellNumRecords(char fileName[], int recordSize){
     FILE *fp = fopen(fileName, "rb"); // Abrir en modo binario
     if (fp == NULL) {
         return 0; // Retornar -1 en caso de error al abrir el archivo
@@ -380,6 +380,7 @@ void CreateTablesWithDataset(){
     CreateCustomersTable("Customers.csv");
     CreateStoresTable("Stores.csv");
     CreateProductsTable("Products.csv");
+    printf("\nTables Created Succesfully\n");
 }
 
 
@@ -428,14 +429,13 @@ int BinarySearch(FILE *fp, unsigned int valueToSearch, int file){
 }
 
 
-
-int CompareCustomersByCustomerKey(void *a, void *b) {
+int CompareCustomersByCustomerKey(void *a, void *b){
     Customers *custA = (Customers *)a;
     Customers *custB = (Customers *)b;
     return custA->CustomerKey - custB->CustomerKey;
 }
 
-int CompareProductsByProductName(void *a, void *b) {
+int CompareProductsByProductName(void *a, void *b){
     Products *prodA = (Products *)a;
     Products *prodB = (Products *)b;
     return strcmp(prodA->ProductName, prodB->ProductName);
@@ -473,7 +473,7 @@ int CompareCustomersByCustomerLocation(void *a, void*b){
 }
 
 
-void Merge(void *array, int left, int right, int medium, int recordSize, int (*compare)(void*, void*)) {
+void Merge(void *array, int left, int right, int medium, int recordSize, int (*compare)(void*, void*)){
     int firstArray = medium - left + 1;
     int secondArray = right - medium;
     void *temporalLeft = calloc(firstArray,  recordSize);
@@ -518,11 +518,11 @@ void Merge(void *array, int left, int right, int medium, int recordSize, int (*c
         posicion++;
     }
 
-    free(temporalLeft);
-    free(temporalRight);
+    free(temporalLeft); temporalLeft = NULL;
+    free(temporalRight); temporalRight = NULL;
 }
 
-void MergeSort(void *array, int left, int right, int recordSize, int (*compare)(void*, void*)) {
+void MergeSort(void *array, int left, int right, int recordSize, int (*compare)(void*, void*)){
     if (left < right) {
         int medium = left + ((right - left) / 2);
 

@@ -4,6 +4,7 @@
         "limits": "c",
         "MergeSortArray.C": "cpp",
         "tables.h": "c",
-        "functions.h": "c"
+        "functions.h": "c",
+        "algorithm": "c"
     }
 }

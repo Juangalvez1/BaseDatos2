@@ -90,6 +90,8 @@ int CompareProductsByProductName(void *a, void *b);
 int CompareSalesByProductKey(void *a, void *b);
 int CompareCustomersByCustomerLocation(void *a, void*b);
 
+//void BubbleSort(void *array, int numRecords, int recordSize, int (*compare)(void*, void*), void (*swap)(char*, char*));
+
 void Merge(void *array, int left, int right, int medium, int recordSize, int (*compare)(void*, void*));
 void MergeSort(void *array, int left, int right, int recordSize, int (*compare)(void*, void*));
 
