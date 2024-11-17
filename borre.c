@@ -4,135 +4,71 @@
 #include <time.h>
 #include "Functions.c"
 
-void PrintExecutionTime(double time){
-    int minutes = 0, seconds = 0;
-    char totalTime[6] = "";
 
-    minutes = (int) time / 60;
-    seconds = (int) time % 60;
+// Función para búsqueda binaria
+int binarySearch(FILE *file, const char *targetDate, ExchangeRates *result) {
 
-    sprintf(totalTime, "%02d'%02d''", minutes, seconds);
-    printf("\n\n%s\n\n", totalTime);
-}
-
-int CompareByCustomerKey(void *a, void *b) {
-    Customers *custA = (Customers *)a;
-    Customers *custB = (Customers *)b;
-    return custA->CustomerKey - custB->CustomerKey;
-}
-
-int CompareByProductKey(void *a, void *b) {
-    Products *prodA = (Products *)a;
-    Products *prodB = (Products *)b;
-    return prodA->ProductKey - prodB->ProductKey;
-}
-
-int CompareBySalesProductKey(void *a, void *b){
-    Sales *saleA = (Sales *)a;
-    Sales *saleB = (Sales *)b;
-    return saleA->ProductKey - saleB->ProductKey;
-}
-
-int CompareByCustomerLocation(void *a, void*b){
-    int result = 0;
-    Customers *custA = (Customers *)a;
-    Customers *custB = (Customers *)b;
-
-    result = strcmp(custA->Continent, custB->Continent);
-    if(result != 0){ 
-        return result;
+    if (!file) {
+        perror("Error al abrir el archivo");
+        return -1;
     }
 
-    result = strcmp(custA->Country, custB->Country);
-    if(result != 0){
-        return result;
+    // Tamaño de un registro
+    size_t recordSize = sizeof(ExchangeRates);
+
+    // Calcular el número total de registros
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    long totalRecords = fileSize / recordSize;
+    fseek(file, 0, SEEK_SET);
+
+    // Variables para la búsqueda binaria
+    long low = 0, high = totalRecords - 1, mid;
+
+    while (low <= high) {
+        mid = low + (low + high) / 2;
+
+        // Posicionar el cursor en el registro medio
+        fseek(file, mid * recordSize, SEEK_SET);
+
+        // Leer el registro
+        ExchangeRates current;
+        fread(&current, recordSize, 1, file);
+
+        // Comparar fechas
+        int cmp = strcmp(current.Date, targetDate);
+        if (cmp == 0) {
+            // Fecha encontrada
+            *result = current;
+            fclose(file);
+            return mid;
+        } else if (cmp < 0) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
 
-    result = strcmp(custA->State, custB->State);
-    if(result != 0){
-        return result;
-    }
-
-    result = strcmp(custA->City, custB->City);
-    return result;
-
-}
-
-void SwapCustomers(void *a, void *b) {
-    Customers *custA = (Customers *)a;
-    Customers *custB = (Customers *)b;
-
-    Customers temp = *custA;
-    *custA = *custB;
-    *custB = temp;
+    // No se encontró la fecha
+    return -1;
 }
 
 int main() {
-    // Crear tabla de clientes de ejemplo
-
-    int start = 0, finish = 0;
-    double totalSeconds = 0;
-    start = clock();
-
-
-    CreateCustomersTable("Customers.csv");
-
-    // Determinar el tamaño del arreglo basado en el archivo
-    int sizeCustomers = TellNumRecords("CustomersTable", sizeof(Customers));
-    printf("LLega - Registros a leer: %d\n", sizeCustomers);
-
-    if (sizeCustomers == 0) {
-        printf("No hay registros en el archivo.\n");
-        return 1;
+    FILE *fp = fopen("ExchangeRatesTable", "rb+");
+    ExchangeRates record;
+    fseek(fp, sizeof(ExchangeRates) * 5, SEEK_SET);
+    fread(&record, sizeof(ExchangeRates), 1, fp);
+    const char *targetDate = record.Date;
+    ExchangeRates result;
+    int position = binarySearch(fp, targetDate, &result) != 0;
+    if(position != -1){
+        printf("Fecha encontrada: %s\n", result.Date);
+        printf("Moneda: %s\n", result.Currency);
+        printf("Tipo de cambio: %.2f\n", result.Exchange);
+        printf("\tposition: %i\n", position);
+    } else {
+        printf("Fecha no encontrada.\n");
     }
-
-    FILE *fpCustomers = fopen("CustomersTable", "rb+");
-    if (fpCustomers == NULL) {
-        printf("Error al abrir el archivo para lectura/escritura.\n");
-        return 1;
-    }
-    
-    Customers *regs = (Customers *)calloc(sizeCustomers, sizeof(Customers));
-    // Leer los registros del archivo en el arreglo
-    for (int i = 0; i < sizeCustomers; i++) {
-        printf("Guarda en regs %i\n", i);
-        fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
-        fread(&regs[i], sizeof(Customers), 1, fpCustomers);
-    }
-
-
-    /*//Ordenar el arreglo en memoria
-    for (int step = 0; step < sizeCustomers - 1; step++) {
-        printf("2. Llega %i\n", step + 1);
-        for (int i = 0; i < sizeCustomers - step - 1; i++) {
-            if (regs[i].CustomerKey > regs[i + 1].CustomerKey) {
-                // Intercambiar registros
-                Customers temp = regs[i];
-                regs[i] = regs[i + 1];
-                regs[i + 1] = temp;
-            }
-        }
-    }
-    */
-    //MergeSort(regs, 0, sizeCustomers - 1, sizeof(Customers), CompareByCustomerKey);
-    
-    BubbleSort(regs, sizeCustomers, sizeof(Customers), CompareByCustomerKey, SwapCustomers);
-
-    // Escribir los registros ordenados de vuelta al archivo
-    
-    for (int i = 0; i < sizeCustomers; i++) {
-        printf("Guarda en archivo %i\n", i + 1);
-        fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
-        fwrite(&regs[i], sizeof(Customers), 1, fpCustomers);
-    }
-
-    finish = clock();
-
-    totalSeconds = ((double)(finish - start)) / CLOCKS_PER_SEC;
-
-    PrintExecutionTime(totalSeconds);
-
-    free(regs);
-    fclose(fpCustomers);
+    fclose(fp);
     return 0;
 }

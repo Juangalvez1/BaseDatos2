@@ -5,6 +5,9 @@
         "MergeSortArray.C": "cpp",
         "tables.h": "c",
         "functions.h": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "array": "c",
+        "initializer_list": "c",
+        "utility": "c"
     }
 }

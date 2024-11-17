@@ -2,7 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <windows.h>
 #include "Functions.h"
+
+void SetColor(int color) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
+}
 
 
 int TellNumRecords(char fileName[], int recordSize){
@@ -68,7 +74,7 @@ void CreateSalesTable(char originFileName[]){
         }
         
         token = strtok(NULL, ",");
-        recordSales.CustomerKey = (unsigned int) atoi(token);
+        recordSales.CustomerKey = (unsigned long int) atoi(token);
         
         token = strtok(NULL, ",");
         recordSales.StoreKey = (unsigned short int) atoi(token);
@@ -120,7 +126,7 @@ void CreateCustomersTable(char originFileName[]){
     while (fgets(line, sizeof(line), fpOrigin)){
         if(numberRecord != 0){
             char *token = strtok(line, ";");
-            recordCustomer.CustomerKey = (unsigned int) atoi(token);
+            recordCustomer.CustomerKey = (unsigned long int) atoi(token);
 
             token = strtok(NULL, ";");
             strcpy(recordCustomer.Gender, token);
@@ -139,7 +145,7 @@ void CreateCustomersTable(char originFileName[]){
 
             token = strtok(NULL, ";");
             if (token[0] >= 48 && token[0] <= 57){
-                recordCustomer.ZipCode = (unsigned int) atoi(token);
+                recordCustomer.ZipCode = (unsigned long int) atoi(token);
                 token = strtok(NULL, ";");
             } else {
                 recordCustomer.ZipCode = 0;
@@ -380,12 +386,15 @@ void CreateTablesWithDataset(){
     CreateCustomersTable("Customers.csv");
     CreateStoresTable("Stores.csv");
     CreateProductsTable("Products.csv");
+    system("cls");
+    SetColor(9);
     printf("\nTables Created Succesfully\n");
 }
 
 
-int BinarySearch(FILE *fp, unsigned int valueToSearch, int file){
-    unsigned int start = 0, middle = 0, end = 0, sizeOfRecord = 0, key = 0;
+int BinarySearch(FILE *fp, unsigned long int valueToSearch, int file){
+    unsigned int start = 0, middle = 0, end = 0, sizeOfRecord = 0;
+    unsigned long int key = 0;
 
     if(file == 1){
 		sizeOfRecord = sizeof(Products);
@@ -393,7 +402,9 @@ int BinarySearch(FILE *fp, unsigned int valueToSearch, int file){
 		sizeOfRecord = sizeof(Customers);	
 	} else if(file == 3){
 		sizeOfRecord = sizeof(Sales);
-	} else {
+	} else if(file == 4){
+        sizeOfRecord = sizeof(Sales);
+    } else {
 		return -1;
 	}
 
@@ -406,18 +417,27 @@ int BinarySearch(FILE *fp, unsigned int valueToSearch, int file){
 		if (file == 1){
 			Products recordProduct;
 			fread(&recordProduct, sizeOfRecord, 1, fp);
-			key = (unsigned int) recordProduct.ProductKey;
+			key = (unsigned long int) recordProduct.ProductKey;
+            //printf("productsKey que agarro: %u\t", recordProduct.ProductKey);
 		} else if (file == 2){
 			Customers recordCustomer;
 			fread(&recordCustomer, sizeOfRecord, 1, fp);
-			key = (unsigned int) recordCustomer.CustomerKey;
+			key = (unsigned long int) recordCustomer.CustomerKey;
 		} else if (file == 3){
 			Sales recordSale;
 			fread(&recordSale, sizeOfRecord, 1, fp);
-			key = (unsigned int) recordSale.ProductKey;
-		}
+			key = (unsigned long int) recordSale.ProductKey;
+		}  else if(file == 4){
+            Sales recordSale;
+			fread(&recordSale, sizeOfRecord, 1, fp);
+			key = (unsigned long int) recordSale.CustomerKey;
+        } else {
+		    return -1;
+	    }
+        //printf("Start: %u\tEnd: %u\tMiddle: %u\tValueToSearch: %lu\tKey: %lu\n", start, end, middle, valueToSearch, key);
         
         if(key == valueToSearch){
+            //printf("\nPOR FIN\n");
             return middle;
         }else if(key < valueToSearch){
 			start = middle + 1;
@@ -428,12 +448,43 @@ int BinarySearch(FILE *fp, unsigned int valueToSearch, int file){
 	return -1;
 }
 
+int BinarySearchExchangeDate(FILE *fp, char DateToSearch[11]){
+    unsigned int start = 0, middle = 0, end = 0, sizeOfRecord = sizeof(ExchangeRates);
+    ExchangeRates record;
+    fseek(fp, 0 ,SEEK_END);
+    end = ( ftell(fp) / sizeOfRecord ) - 1;
+    while (start <= end) {
+        middle = start + ((end - start) / 2);
+        fseek(fp, middle * sizeOfRecord, SEEK_SET);
+        fread(&record, sizeOfRecord, 1, fp);
 
-int CompareCustomersByCustomerKey(void *a, void *b){
-    Customers *custA = (Customers *)a;
-    Customers *custB = (Customers *)b;
-    return custA->CustomerKey - custB->CustomerKey;
+        char key[11] = "", keyAux[11] = "";
+        strcpy(key, record.Date);
+
+        printf("Start: %u, Middle: %u, End: %u, Clave: '%s', Buscando: '%s' ", start, middle, end, key, DateToSearch);
+        //int month, day, year;
+
+        // Leer el formato flexible (con o sin ceros iniciales)
+        //sscanf(key, "%d/%d/%d", &month, &day, &year);
+
+        // Crear la nueva fecha en formato AAAA/MM/DD
+        //sprintf(keyAux, "%04d/%02d/%02d", year, month, day);
+
+        printf(",KeyAux: %s\n", keyAux);
+
+
+        int comparation1 = strcmp(keyAux, DateToSearch);
+        if (comparation1 == 0) {
+            return middle;
+        } else if (comparation1 < 0) {
+            start = middle + 1;
+        } else {
+            end = middle - 1;
+        }
+    }
+	return -1;
 }
+
 
 int CompareProductsByProductName(void *a, void *b){
     Products *prodA = (Products *)a;
@@ -441,10 +492,16 @@ int CompareProductsByProductName(void *a, void *b){
     return strcmp(prodA->ProductName, prodB->ProductName);
 }
 
-int CompareSalesByProductKey(void *a, void *b){
-    Sales *saleA = (Sales *)a;
-    Sales *saleB = (Sales *)b;
-    return saleA->ProductKey - saleB->ProductKey;
+int CompareProductsByProductKey(void *a, void *b){
+    Products *prodA = (Products *)a;
+    Products *prodB = (Products *)b;
+    return prodA->ProductKey - prodB->ProductKey;
+}
+
+int CompareCustomersByCustomerKey(void *a, void *b){
+    Customers *custA = (Customers *)a;
+    Customers *custB = (Customers *)b;
+    return custA->CustomerKey - custB->CustomerKey;
 }
 
 int CompareCustomersByCustomerLocation(void *a, void*b){
@@ -472,10 +529,41 @@ int CompareCustomersByCustomerLocation(void *a, void*b){
 
 }
 
+int CompareCustomersByName(void *a, void *b){
+    Customers *custA = (Customers *)a;
+    Customers *custB = (Customers *)b;
+    return strcmp(custA->Name, custB->Name);
+}
 
-void Merge(void *array, int left, int right, int medium, int recordSize, int (*compare)(void*, void*)){
-    int firstArray = medium - left + 1;
-    int secondArray = right - medium;
+int CompareSalesByProductKey(void *a, void *b){
+    Sales *saleA = (Sales *)a;
+    Sales *saleB = (Sales *)b;
+    return (int)(saleA->ProductKey - saleB->ProductKey);
+}
+
+int CompareSalesByCustomerKey(void *a, void *b){
+    Sales *saleA = (Sales *)a;
+    Sales *saleB = (Sales *)b;
+    return saleA->CustomerKey - saleB->CustomerKey;
+}
+
+int CompareSalesByOrderNumber(void *a, void *b){
+    Sales *saleA = (Sales *)a;
+    Sales *saleB = (Sales *)b;
+    long int comparation = saleA->OrderNumber - saleB->OrderNumber;
+    
+    if(comparation != 0){
+        return (int)comparation;
+    } else{
+        return (int)(saleA->ProductKey - saleB->ProductKey);
+    }
+    
+}
+
+
+void MergeArray(void *array, int left, int right, int middle, int recordSize, int (*compare)(void*, void*)){
+    int firstArray = middle - left + 1;
+    int secondArray = right - middle;
     void *temporalLeft = calloc(firstArray,  recordSize);
     void *temporalRight = calloc(secondArray,  recordSize);
 
@@ -486,7 +574,7 @@ void Merge(void *array, int left, int right, int medium, int recordSize, int (*c
 
     //Copy the values of the second half
     for (int j = 0; j < secondArray; j++) {
-        memcpy((char*)temporalRight + j * recordSize, (char*)array + (medium + 1 + j) * recordSize, recordSize);
+        memcpy((char*)temporalRight + j * recordSize, (char*)array + (middle + 1 + j) * recordSize, recordSize);
     }
 
     int i = 0, j = 0;
@@ -522,18 +610,193 @@ void Merge(void *array, int left, int right, int medium, int recordSize, int (*c
     free(temporalRight); temporalRight = NULL;
 }
 
-void MergeSort(void *array, int left, int right, int recordSize, int (*compare)(void*, void*)){
+void MergeSortArray(void *array, int left, int right, int recordSize, int (*compare)(void*, void*)){
+    if (left < right) {
+        int middle = left + ((right - left) / 2);
+
+        //Recursive call for the first half
+        MergeSortArray(array, left, middle, recordSize, compare);
+
+        //Recursive call for the second half
+        MergeSortArray(array, middle + 1, right, recordSize, compare);
+
+        //Order and combine the two halfs
+        MergeArray(array, left, right, middle, recordSize, compare);
+    }
+}
+
+
+void MergeFile(FILE *fp, int left, int right, int middle, int recordSize, int (*compare)(void*, void*)){
+    // Calcular el tamaño de los sub-arrays
+    int firstArray = middle - left + 1;
+    int secondArray = right - middle;
+
+    // Crear arrays temporales para almacenar los registros
+    void *temporalLeft = calloc(firstArray, recordSize);
+    void *temporalRight = calloc(secondArray, recordSize);
+
+    // Mover el puntero al inicio del archivo
+    fseek(fp, left * recordSize, SEEK_SET);
+
+    // Leer registros para el primer sub-array (izquierda)
+    fread(temporalLeft, recordSize, firstArray, fp);
+   
+
+    // Leer registros para el segundo sub-array (derecha)
+    fseek(fp, (middle + 1) * recordSize, SEEK_SET);
+    fread(temporalRight, recordSize, secondArray, fp);
+
+    // Índices de los sub-arrays temporales
+    int i = 0, j = 0;
+    // Posición de escritura en el archivo
+    int posicion = left;
+
+    // Mover el puntero al inicio del archivo donde se escribirá
+    fseek(fp, posicion * recordSize, SEEK_SET);
+
+    // Fusionar los registros ordenados
+    while (i < firstArray && j < secondArray) {
+        fseek(fp, posicion * recordSize, SEEK_SET);
+        if (compare((char*)temporalLeft + i * recordSize, (char*)temporalRight + j * recordSize) <= 0) {
+            fseek(fp, posicion * recordSize, SEEK_SET);
+            fwrite((char*)temporalLeft + i * recordSize, recordSize, 1, fp);
+            i++;
+        } else {
+            fseek(fp, posicion * recordSize, SEEK_SET);
+            fwrite((char*)temporalRight + j * recordSize, recordSize, 1, fp);
+            j++;
+        }
+        posicion++;
+    }
+
+    // Escribir los registros restantes del primer sub-array
+    while (i < firstArray) {
+        fseek(fp, posicion * recordSize, SEEK_SET);
+        fwrite((char*)temporalLeft + i * recordSize, recordSize, 1, fp);
+        i++;
+        posicion++;
+    }
+
+    // Escribir los registros restantes del segundo sub-array
+    while (j < secondArray) {
+        fseek(fp, posicion * recordSize, SEEK_SET);
+        fwrite((char*)temporalRight + j * recordSize, recordSize, 1, fp);
+        j++;
+        posicion++;
+    }
+}
+
+void MergeSortFile(FILE *fp, int left, int right, int recordSize, int (*compare)(void*, void*)){
+    if(left<right){
+        //variable middle que guarda el valor de la posición de la mitad del archivo
+        int middle = left + (right - left) / 2;
+
+        //Volvemos a llamar a la función pero desde la izquierda hasta la mitad
+        MergeSortFile(fp, left, middle, recordSize, compare);
+        //Volvemos a llamar a la función pero desde la mitad + 1  hasta la derecha
+        MergeSortFile(fp, middle + 1, right, recordSize, compare);
+        //Unimos las dos mitades
+        MergeFile(fp, left, right, middle, recordSize, compare);
+    }
+}
+
+/*
+void MergeFile(FILE *file, int left, int right, int medium, int recordSize, int (*compare)(void*, void*)) {
+    int firstArray = medium - left + 1;
+    int secondArray = right - medium;
+
+    // Crear archivos temporales
+    FILE *leftFile = fopen("tempLeft.bin", "wb+");
+    FILE *rightFile = fopen("tempRight.bin", "wb+");
+
+    void *buffer = malloc(recordSize);
+
+    // Copiar los valores de la primera mitad al archivo temporal izquierdo
+    for (int i = 0; i < firstArray; i++) {
+        fseek(file, (left + i) * recordSize, SEEK_SET);
+        fread(buffer, recordSize, 1, file);
+        fwrite(buffer, recordSize, 1, leftFile);
+    }
+
+    // Copiar los valores de la segunda mitad al archivo temporal derecho
+    for (int j = 0; j < secondArray; j++) {
+        fseek(file, (medium + 1 + j) * recordSize, SEEK_SET);
+        fread(buffer, recordSize, 1, file);
+        fwrite(buffer, recordSize, 1, rightFile);
+    }
+
+    fseek(leftFile, 0, SEEK_SET);
+    fseek(rightFile, 0, SEEK_SET);
+
+    int i = 0, j = 0;
+    int posicion = left;
+
+    // Mezclar y ordenar los registros de los archivos temporales de vuelta al archivo original
+    while (i < firstArray && j < secondArray) {
+        fseek(leftFile, i * recordSize, SEEK_SET);
+        fseek(rightFile, j * recordSize, SEEK_SET);
+
+        void *leftRecord = malloc(recordSize);
+        void *rightRecord = malloc(recordSize);
+
+        fread(leftRecord, recordSize, 1, leftFile);
+        fread(rightRecord, recordSize, 1, rightFile);
+
+        if (compare(leftRecord, rightRecord) <= 0) {
+            fseek(file, posicion * recordSize, SEEK_SET);
+            fwrite(leftRecord, recordSize, 1, file);
+            i++;
+        } else {
+            fseek(file, posicion * recordSize, SEEK_SET);
+            fwrite(rightRecord, recordSize, 1, file);
+            j++;
+        }
+
+        posicion++;
+        free(leftRecord);
+        free(rightRecord);
+    }
+
+    // Copiar los elementos restantes del archivo temporal izquierdo
+    while (i < firstArray) {
+        fseek(leftFile, i * recordSize, SEEK_SET);
+        fread(buffer, recordSize, 1, leftFile);
+        fseek(file, posicion * recordSize, SEEK_SET);
+        fwrite(buffer, recordSize, 1, file);
+        i++;
+        posicion++;
+    }
+
+    // Copiar los elementos restantes del archivo temporal derecho
+    while (j < secondArray) {
+        fseek(rightFile, j * recordSize, SEEK_SET);
+        fread(buffer, recordSize, 1, rightFile);
+        fseek(file, posicion * recordSize, SEEK_SET);
+        fwrite(buffer, recordSize, 1, file);
+        j++;
+        posicion++;
+    }
+
+    // Liberar memoria y cerrar archivos temporales
+    free(buffer);
+    fclose(leftFile);
+    fclose(rightFile);
+    remove("tempLeft.bin");
+    remove("tempRight.bin");
+}
+
+void MergeSortFile(FILE *file, int left, int right, int recordSize, int (*compare)(void*, void*)) {
     if (left < right) {
         int medium = left + ((right - left) / 2);
 
-        //Recursive call for the first half
-        MergeSort(array, left, medium, recordSize, compare);
+        // Llamada recursiva para la primera mitad
+        MergeSortFile(file, left, medium, recordSize, compare);
 
-        //Recursive call for the second half
-        MergeSort(array, medium + 1, right, recordSize, compare);
+        // Llamada recursiva para la segunda mitad
+        MergeSortFile(file, medium + 1, right, recordSize, compare);
 
-        //Order and combine the two halfs
-        Merge(array, left, right, medium, recordSize, compare);
-
+        // Combinar las dos mitades
+        MergeFile(file, left, right, medium, recordSize, compare);
     }
 }
+*/

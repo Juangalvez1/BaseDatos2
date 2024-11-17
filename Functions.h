@@ -67,12 +67,14 @@ typedef struct {
 } Stores;
 
 typedef struct {
-    char Date[11];
+    char Date[10];
     char Currency[3];
     float Exchange;
 } ExchangeRates;
 
 // Declaraciones de funciones
+
+void SetColor(int color);
 
 int TellNumRecords(char fileName[], int recordSize);
 
@@ -83,16 +85,27 @@ void CreateStoresTable(char originFileName[]);
 void CreateExchangeRatesTable(char originFileName[]);
 void CreateDatasetTables();
 
-int BinarySearch(FILE *fp, unsigned int valueToSearch, int file);
+int BinarySearch(FILE *fp, unsigned long int valueToSearch, int file);
+int BinarySearchExchangeDate(FILE *fp, char DateToSearch[10]);
+
+int CompareProductsByProductName(void *a, void *b);
+int CompareProductsByProductKey(void *a, void *b);
 
 int CompareCustomersByCustomerKey(void *a, void *b);
-int CompareProductsByProductName(void *a, void *b);
-int CompareSalesByProductKey(void *a, void *b);
 int CompareCustomersByCustomerLocation(void *a, void*b);
+int CompareCustomersByName(void *a, void *b);
+
+int CompareSalesByProductKey(void *a, void *b);
+int CompareSalesByCustomerKey(void *a, void *b);
+int CompareSalesByOrderNumber(void *a, void *b);
 
 //void BubbleSort(void *array, int numRecords, int recordSize, int (*compare)(void*, void*), void (*swap)(char*, char*));
 
-void Merge(void *array, int left, int right, int medium, int recordSize, int (*compare)(void*, void*));
-void MergeSort(void *array, int left, int right, int recordSize, int (*compare)(void*, void*));
+void MergeArray(void *array, int left, int right, int medium, int recordSize, int (*compare)(void*, void*));
+void MergeSortArray(void *array, int left, int right, int recordSize, int (*compare)(void*, void*));
+
+
+void MergeFile(FILE *fp, int left, int right, int middle, int recordSize, int (*compare)(void*, void*));
+void MergeSortFile(FILE *fp, int left, int right, int recordSize, int (*compare)(void*, void*));
 
 #endif // FUNCTIONS_H

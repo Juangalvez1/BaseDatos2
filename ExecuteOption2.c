@@ -32,7 +32,7 @@ void DeterminateCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCusto
     		printf(" - No sales reported\n");
     	} else {
 			//TemporalFile, will be used for each product to store te record of the customers who have bougth it
-			FILE *fpTemporal = fopen("TemporalFileOption2", "wb+");
+			FILE *fpTemporal = fopen("TemporalFileOption2", "rb+");
 			if (fpTemporal == NULL) {
 			    printf("Error abriendo archivo temporal.\n");
 			    return;
@@ -67,7 +67,7 @@ void DeterminateCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCusto
 
 			//While to store each customer that has bougth the current product into TemporalFileOption2
 			//It will loop till the productKey its a different one or it reached the end of the SalesTable file
-    	    while (recordSale.ProductKey == productKey && index <= 66283){
+    	    while (recordSale.ProductKey == productKey && index < TellNumRecords("SalesTable", sizeof(Sales))){
 				customerKey = recordSale.CustomerKey;
 
 				//Getting the position in CustomersTable of each customer that has bougth the current product
@@ -96,20 +96,20 @@ void DeterminateCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCusto
 				fseek(fpTemporal, sizeof(Customers) * i, SEEK_SET);
 				fread(&recordsCustomers[i], sizeof(Customers), 1, fpTemporal);
 			}
-		
+			
+			Customers reg1, reg2;
 			if(typeofSort == 1){ //Executing option 2.1
-				for (int step = 0; step < numOfBuyers - 1; step += 1){
-					for (int i = 0; i < numOfBuyers - step - 1; i += 1){
+				for(int step = 0; step < numOfBuyers - 1; step += 1){
+					for(int i = 0; i < numOfBuyers - step - 1; i += 1){
 						if(CompareCustomersByCustomerLocation(&recordsCustomers[i], &recordsCustomers[i + 1]) > 0){
 							Customers temp = recordsCustomers[i];
-							recordsCustomers[i] = recordsCustomers[i + 1];
-							recordsCustomers[i + 1] = temp;
+                            recordsCustomers[i] = recordsCustomers[i + 1];
+                            recordsCustomers[i + 1] = temp;
 						}
 					}
 				}
-				
 			} else if (typeofSort == 2){ //Executing option 2.2
-				MergeSort(recordsCustomers, 0, numOfBuyers - 1, sizeof(Customers), CompareCustomersByCustomerLocation);
+				MergeSortArray(recordsCustomers, 0, numOfBuyers - 1, sizeof(Customers), CompareCustomersByCustomerLocation);
 			}
 		
 			//For to write each record alredy ordered in the file CustomersTable
@@ -118,9 +118,9 @@ void DeterminateCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCusto
 				fseek(fpTemporal, sizeof(Customers) * i, SEEK_SET);
 				fwrite(&recordsCustomers[i], sizeof(Customers), 1, fpTemporal);
 			}
-
+			
 			//For to display each location of the customers that have bougth the current product
-			for(int i  = 0; i < numOfBuyers ; i++){
+			for(int i  = 0; i < numOfBuyers ; i += 1){
 				fseek(fpTemporal, sizeof(Customers) * i, SEEK_SET);
 				fread(&recordCustomer, sizeof(Customers), 1, fpTemporal);
 
@@ -128,11 +128,11 @@ void DeterminateCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCusto
 			}
 
 			fclose(fpTemporal);
-			free(recordsCustomers);
-			recordsCustomers = NULL;
+			free(recordsCustomers); recordsCustomers = NULL;
  		}
 	}
 }
+
 
 void BubbleSortOption2(){
 	int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); 	//Quantity of products in ProductsTable
@@ -233,7 +233,7 @@ void BubbleSortOption2(){
 	free(recordsCustomers); recordsCustomers = NULL;	//Free the diamic memory where recordsCustomers where stored
 	free(recordsSales); recordsSales = NULL;			//Free the diamic memory where recordsSales where stored
 
-	DeterminateCustomersLocation(fpProducts, fpSales, fpCustomers, numRecordsProducts, 2);
+	DeterminateCustomersLocation(fpProducts, fpSales, fpCustomers, numRecordsProducts, 1);
 
     fclose(fpProducts);
     fclose(fpCustomers);
@@ -270,7 +270,7 @@ void MergeSortOption2(){
 		fread(&recordsProducts[i], sizeof(Products), 1, fpProducts);
 	}
 
-	MergeSort(recordsProducts, 0, numRecordsProducts - 1, sizeof(Products), CompareProductsByProductName); //To MergeSort the ProductsTable File
+	MergeSortArray(recordsProducts, 0, numRecordsProducts - 1, sizeof(Products), CompareProductsByProductName); //To MergeSortArray the ProductsTable File
 
 	for (int i = 0; i < numRecordsProducts; i += 1){
 		//printf("\nArchivo Products %i", i + 1);
@@ -286,7 +286,7 @@ void MergeSortOption2(){
 		fread(&recordsCustomers[i], sizeof(Customers), 1, fpCustomers);
 	}
 
-	MergeSort(recordsCustomers, 0,numRecordsCustomers - 1, sizeof(Customers), CompareCustomersByCustomerKey); //To MergeSort the CustomersTable File
+	MergeSortArray(recordsCustomers, 0,numRecordsCustomers - 1, sizeof(Customers), CompareCustomersByCustomerKey); //To MergeSortArray the CustomersTable File
 
 	for (int i = 0; i < numRecordsCustomers; i += 1){
 		//printf("\nArchivo Customers %i", i + 1);
@@ -302,7 +302,7 @@ void MergeSortOption2(){
 		fread(&recordsSales[i], sizeof(Sales), 1, fpSales);
 	}
 	
-	MergeSort(recordsSales, 0,numRecordsSales - 1, sizeof(Sales), CompareSalesByProductKey); //To MergeSort the SalesTable File
+	MergeSortArray(recordsSales, 0,numRecordsSales - 1, sizeof(Sales), CompareSalesByProductKey); //To MergeSortArray the SalesTable File
 
 	for (int i = 0; i < numRecordsSales; i += 1){
 		//printf("\nArchivo Sales %i", i + 1);
