@@ -448,7 +448,7 @@ int BinarySearch(FILE *fp, unsigned long int valueToSearch, int file){
 	return -1;
 }
 
-int BinarySearchExchangeDate(FILE *fp, char DateToSearch[11]){
+int BinarySearchExchangeDate(FILE *fp, Sales recordSale){
     unsigned int start = 0, middle = 0, end = 0, sizeOfRecord = sizeof(ExchangeRates);
     ExchangeRates record;
     fseek(fp, 0 ,SEEK_END);
@@ -461,19 +461,44 @@ int BinarySearchExchangeDate(FILE *fp, char DateToSearch[11]){
         char key[11] = "", keyAux[11] = "";
         strcpy(key, record.Date);
 
-        printf("Start: %u, Middle: %u, End: %u, Clave: '%s', Buscando: '%s' ", start, middle, end, key, DateToSearch);
-        //int month, day, year;
+        printf("Start: %u, Middle: %u, End: %u, Clave: '%s', Buscando: %d/%d/%d ", start, middle, end, key, recordSale.OrderDate.MM, recordSale.OrderDate.DD, recordSale.OrderDate.AAAA);
+        printf(",KeyAux: %s\n", keyAux);
+        
+        int currentMonth = 0, currentDay = 0, currentYear = 0;
+        int month = 0, day = 0, year = 0;
+        month = recordSale.OrderDate.MM;
+        day = recordSale.OrderDate.DD;
+        year = recordSale.OrderDate.AAAA;
 
-        // Leer el formato flexible (con o sin ceros iniciales)
-        //sscanf(key, "%d/%d/%d", &month, &day, &year);
+        //Leer el formato flexible (con o sin ceros iniciales)
+        sscanf(key, "%d/%d/%d", &currentMonth, &currentDay, &currentYear);
+        if(currentYear == year){
+            if(currentMonth == month){
+                if(currentDay == day){
+                    return middle;
+                } else if(currentDay > day){
+                    end = middle - 1;
+                } else {
+                    start = middle + 1;
+                }
+            } else if(currentMonth > month){
+                end = middle - 1;
+            } else {
+                start = middle + 1;
+            }
+        } else if(currentYear > year){
+            end = middle - 1;
+        } else {
+            start = middle + 1;
+        }
+
 
         // Crear la nueva fecha en formato AAAA/MM/DD
         //sprintf(keyAux, "%04d/%02d/%02d", year, month, day);
 
-        printf(",KeyAux: %s\n", keyAux);
 
-
-        int comparation1 = strcmp(keyAux, DateToSearch);
+        /*
+        int comparation1 = strcmp(key, DateToSearch);
         if (comparation1 == 0) {
             return middle;
         } else if (comparation1 < 0) {
@@ -481,6 +506,7 @@ int BinarySearchExchangeDate(FILE *fp, char DateToSearch[11]){
         } else {
             end = middle - 1;
         }
+        */
     }
 	return -1;
 }

@@ -97,7 +97,6 @@ void DeterminateCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCusto
 				fread(&recordsCustomers[i], sizeof(Customers), 1, fpTemporal);
 			}
 			
-			Customers reg1, reg2;
 			if(typeofSort == 1){ //Executing option 2.1
 				for(int step = 0; step < numOfBuyers - 1; step += 1){
 					for(int i = 0; i < numOfBuyers - step - 1; i += 1){

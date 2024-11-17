@@ -128,8 +128,8 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 				strcat(orderDate, "/");
 				sprintf(tempDate, "%d", recordSale.OrderDate.AAAA);
 				strcat(orderDate, tempDate);
-				printf("\nfecha de la orden para buscar en exchange: %s, currency code: %s", orderDate, recordSale.CurrencyCode);
-				int positionExchange = BinarySearchExchangeDate(fpExchangeRates, orderDate);
+				printf("fecha de la orden para buscar en exchange: %s, fecha real %d/%d/%d\n", orderDate, recordSale.OrderDate.MM, recordSale.OrderDate.DD, recordSale.OrderDate.AAAA);
+				int positionExchange = BinarySearchExchangeDate(fpExchangeRates, recordSale);
 				printf("\nposition Exchange: %i\n", positionExchange);
 				if(positionExchange != -1){
 					fseek(fpExchangeRates, sizeof(ExchangeRates) * positionExchange, SEEK_SET);

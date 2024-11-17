@@ -86,7 +86,7 @@ void CreateExchangeRatesTable(char originFileName[]);
 void CreateDatasetTables();
 
 int BinarySearch(FILE *fp, unsigned long int valueToSearch, int file);
-int BinarySearchExchangeDate(FILE *fp, char DateToSearch[10]);
+int BinarySearchExchangeDate(FILE *fp, Sales recordSale);
 
 int CompareProductsByProductName(void *a, void *b);
 int CompareProductsByProductKey(void *a, void *b);
