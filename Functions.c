@@ -458,11 +458,12 @@ int BinarySearchExchangeDate(FILE *fp, Sales recordSale){
         fseek(fp, middle * sizeOfRecord, SEEK_SET);
         fread(&record, sizeOfRecord, 1, fp);
 
-        char key[11] = "", keyAux[11] = "";
+        char key[11] = "", currencyCode[3] = "";
         strcpy(key, record.Date);
+        strcpy(currencyCode, record.Currency);
 
-        printf("Start: %u, Middle: %u, End: %u, Clave: '%s', Buscando: %d/%d/%d ", start, middle, end, key, recordSale.OrderDate.MM, recordSale.OrderDate.DD, recordSale.OrderDate.AAAA);
-        printf(",KeyAux: %s\n", keyAux);
+        //printf("Start: %u, Middle: %u, End: %u, Clave: '%s', Buscando: %d/%d/%d ", start, middle, end, key, recordSale.OrderDate.MM, recordSale.OrderDate.DD, recordSale.OrderDate.AAAA);
+        //printf(",KeyAux: %s\n", keyAux);
         
         int currentMonth = 0, currentDay = 0, currentYear = 0;
         int month = 0, day = 0, year = 0;
@@ -491,22 +492,6 @@ int BinarySearchExchangeDate(FILE *fp, Sales recordSale){
         } else {
             start = middle + 1;
         }
-
-
-        // Crear la nueva fecha en formato AAAA/MM/DD
-        //sprintf(keyAux, "%04d/%02d/%02d", year, month, day);
-
-
-        /*
-        int comparation1 = strcmp(key, DateToSearch);
-        if (comparation1 == 0) {
-            return middle;
-        } else if (comparation1 < 0) {
-            start = middle + 1;
-        } else {
-            end = middle - 1;
-        }
-        */
     }
 	return -1;
 }
@@ -651,7 +636,7 @@ void MergeSortArray(void *array, int left, int right, int recordSize, int (*comp
     }
 }
 
-
+/*
 void MergeFile(FILE *fp, int left, int right, int middle, int recordSize, int (*compare)(void*, void*)){
     // Calcular el tamaño de los sub-arrays
     int firstArray = middle - left + 1;
@@ -725,8 +710,8 @@ void MergeSortFile(FILE *fp, int left, int right, int recordSize, int (*compare)
         MergeFile(fp, left, right, middle, recordSize, compare);
     }
 }
+*/
 
-/*
 void MergeFile(FILE *file, int left, int right, int medium, int recordSize, int (*compare)(void*, void*)) {
     int firstArray = medium - left + 1;
     int secondArray = right - medium;
@@ -825,4 +810,3 @@ void MergeSortFile(FILE *file, int left, int right, int recordSize, int (*compar
         MergeFile(file, left, right, medium, recordSize, compare);
     }
 }
-*/

@@ -27,7 +27,7 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 	unsigned int customerKey = 0; 						//Used to store the ProductKey of each Product in ProductTable
 	unsigned int productKey = 0;						//Used to store the Customer key of a customer which has bougth a Product
 
-    for(int i = 0; i < numOfCustomers; i += 1){
+    for(int i = 0; i < numOfCustomers && i < 5; i += 1){
         fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
     	fread(&recordCustomer, sizeof(Customers), 1, fpCustomers);
 
@@ -128,14 +128,14 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 				strcat(orderDate, "/");
 				sprintf(tempDate, "%d", recordSale.OrderDate.AAAA);
 				strcat(orderDate, tempDate);
-				printf("fecha de la orden para buscar en exchange: %s, fecha real %d/%d/%d\n", orderDate, recordSale.OrderDate.MM, recordSale.OrderDate.DD, recordSale.OrderDate.AAAA);
+				//printf("fecha de la orden para buscar en exchange: %s, fecha real %d/%d/%d\n", orderDate, recordSale.OrderDate.MM, recordSale.OrderDate.DD, recordSale.OrderDate.AAAA);
 				int positionExchange = BinarySearchExchangeDate(fpExchangeRates, recordSale);
-				printf("\nposition Exchange: %i\n", positionExchange);
+				//printf("\nposition Exchange: %i\n", positionExchange);
 				if(positionExchange != -1){
 					fseek(fpExchangeRates, sizeof(ExchangeRates) * positionExchange, SEEK_SET);
 					fread(&recordExchange, sizeof(ExchangeRates), 1, fpExchangeRates);
 					exchange = recordExchange.Exchange;
-					printf("\n\tfecha: %s\tExchange: %f\t'Exchange': %f\n", recordExchange.Date, recordExchange.Exchange, exchange);
+					//printf("\n\tfecha: %s\tExchange: %f\t'Exchange': %f\n", recordExchange.Date, recordExchange.Exchange, exchange);
 				}
 				
 				long int orderNumber = recordSale.OrderNumber;
