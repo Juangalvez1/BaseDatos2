@@ -67,7 +67,7 @@ typedef struct {
 } Stores;
 
 typedef struct {
-    char Date[10];
+    char Date[11];
     char Currency[3];
     float Exchange;
 } ExchangeRates;
@@ -87,6 +87,7 @@ void CreateDatasetTables();
 
 int BinarySearch(FILE *fp, unsigned long int valueToSearch, int file);
 int BinarySearchExchangeDate(FILE *fp, Sales recordSale);
+float BinarySearchExchangeCurrency( FILE *fp , Sales recordExchange );
 
 int CompareProductsByProductName(void *a, void *b);
 int CompareProductsByProductKey(void *a, void *b);
@@ -98,6 +99,8 @@ int CompareCustomersByName(void *a, void *b);
 int CompareSalesByProductKey(void *a, void *b);
 int CompareSalesByCustomerKey(void *a, void *b);
 int CompareSalesByOrderNumber(void *a, void *b);
+
+int CompareExchangeByCurrencyCode(void *a, void *b);
 
 //void BubbleSort(void *array, int numRecords, int recordSize, int (*compare)(void*, void*), void (*swap)(char*, char*));
 

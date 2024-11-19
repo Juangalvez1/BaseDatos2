@@ -195,7 +195,7 @@ void BubbleSortOption2(){
 			fread(&reg1, sizeof(Products), 1, fpProducts);
 
 			fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET);
-			fread(&reg1, sizeof(Products), 1, fpProducts);
+			fread(&reg2, sizeof(Products), 1, fpProducts);
 
 			if(strcmp(reg1.ProductName, reg2.ProductName) > 0){
 				fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
@@ -215,7 +215,7 @@ void BubbleSortOption2(){
 			fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
 			fread(&reg1, sizeof(Customers), 1, fpCustomers);
 
-			fseek(fpCustomers, sizeof(Customers) * i + 1, SEEK_SET);
+			fseek(fpCustomers, sizeof(Customers) * (i + 1), SEEK_SET);
 			fread(&reg2, sizeof(Customers), 1, fpCustomers);
 
 			if(reg1.CustomerKey > reg2.CustomerKey){
