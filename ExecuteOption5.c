@@ -13,7 +13,8 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 	FILE *fpExchangeRates = NULL;
 	FILE *fpTemporalSales = NULL;
 
-    char customerName[40] = ""; 						//Used to store the ProductName of each Product in ProductsTable
+    char customerName[40] = ""; 		
+					//Used to store the ProductName of each Product in ProductsTable
 	unsigned int customerKey = 0; 						//Used to store the ProductKey of each Product in ProductTable
 
     for(int i = 0; i < numOfCustomers; i += 1){
@@ -139,33 +140,33 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 						fseek(fpExchangeRates, sizeof(ExchangeRates) * index, SEEK_SET);
 						fread(&recordExchange, sizeof(ExchangeRates), 1, fpExchangeRates);
 						fseek(fpTemporalExchange, sizeof(ExchangeRates) * i, SEEK_SET);
-						fwrite(&recordExchange, sizeof(ExchangeRates), 1, fpExchangeRates);
+						fwrite(&recordExchange, sizeof(ExchangeRates), 1, fpTemporalExchange);
 						// printf("date:%s   currency:%s exchange:%f \n", recordExchange.Date, recordExchange.Currency, recordExchange.Exchange);
 					}
 
 					int indexTemoralExchange = -1;
-					char currentCurrencyCode[3] = "";
-					strcpy(currentCurrencyCode, tempRecordSale1.CurrencyCode);
-					if (strcmp("USD", currentCurrencyCode) == 0){
+					if (tempRecordSale1.CurrencyCode[0] == 'U'){
 						indexTemoralExchange = 0;
 					}
-					else if (strcmp("CAD", currentCurrencyCode) == 0){
+					else if (tempRecordSale1.CurrencyCode[0] == 'C'){
 						indexTemoralExchange = 1;
 					}
-					else if (strcmp("AUD", currentCurrencyCode) == 0){
+					else if (tempRecordSale1.CurrencyCode[0] == 'A'){
 						indexTemoralExchange = 2;
 					}
-					else if (strcmp("EUR", currentCurrencyCode) == 0){
+					else if (tempRecordSale1.CurrencyCode[0] == 'E'){
 						indexTemoralExchange = 3;
 					}
-					else if (strcmp("GBP", currentCurrencyCode) == 0){
+					else if (tempRecordSale1.CurrencyCode[0] == 'G'){
 						indexTemoralExchange = 4;
 					}
+					//printf ("\n\t indextemporal : %i" , indexTemoralExchange);
 					fseek(fpTemporalExchange, sizeof(ExchangeRates) * indexTemoralExchange, SEEK_SET);
 					fread(&recordExchange, sizeof(ExchangeRates), 1, fpTemporalExchange);
-
+                
 					exchange = recordExchange.Exchange;
-
+					//printf("\n fecha : %s     exchange: %f\n", recordExchange.Date ,  exchange);
+                   
 					fclose(fpTemporalExchange);
 				}
 

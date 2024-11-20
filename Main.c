@@ -23,6 +23,7 @@
 #include <time.h>
 #include "Functions.c"
 #include "ExecuteOption2Files.c"
+#include "ExecuteOption4.c"
 #include "ExecuteOption5.c"
 
 
@@ -100,6 +101,32 @@ void Option2(int sortType){
     printf("\n********************************LAST LINE OF THE REPORT********************************\n");
 }
 
+void Option4(int sortType){
+    int start = 0, finish = 0;
+    double totalSeconds = 0.;
+    start = clock();
+    printf("\n---------------------------------------------------------------------------------------");
+    printf("\nCompany Global Electronics Retailer\n");
+    ShowDateTime();
+    //printf("Customer list ordered by Costumer name  + order date for sale + ProductKey\n");
+
+    if(sortType == 1){
+        BubbleSortOption4();
+    } else if (sortType == 2){
+        MergeSortOption4();
+    }
+
+
+    finish = clock();
+
+    totalSeconds = ((double)(finish - start)) / CLOCKS_PER_SEC;
+    
+    printf("\n---------------------------------------------------------------------------------------");
+    printf("\nTime used to produce this listing: "); 
+    PrintExecutionTime(totalSeconds);
+    printf("\n********************************LAST LINE OF THE REPORT********************************\n");
+}
+
 void Option5(int sortType){
     int start = 0, finish = 0;
     double totalSeconds = 0.;
@@ -145,31 +172,42 @@ int main() {
         //printf("%f\n", option);
         if (option == 10) {                                 // Execute option 1 of the menu
             CreateTablesWithDataset();
+            SetColor(9);
+            system("cls");
+            printf("\nTables Created Succesfully\n");
             creationOfTables++;
         } else if (option == 21 && creationOfTables) {      // Execute option 2.1 of the menu
             system("cls");
             Option2(1);
+            creationOfTables = 0;
         } else if (option == 22 && creationOfTables) {      // Execute option 2.2 of the menu
             system("cls");
             Option2(2);
+            creationOfTables = 0;
         } else if (option == 31 && creationOfTables) {      // Execute option 3.1 of the menu
             system("cls");
             printf("Executing option 3.1\n");
+            creationOfTables = 0;
         } else if (option == 32 && creationOfTables) {      // Execute option 3.2 of the menu
             system("cls");
             printf("Executing option 3.2\n");
+            creationOfTables = 0;
         } else if (option == 41 && creationOfTables) {      // Execute option 4.1 of the menu
             system("cls");
-            printf("Executing option 4.1\n");
+            Option4(1);
+            creationOfTables = 0;
         } else if (option == 42 && creationOfTables) {      // Execute option 4.2 of the menu
             system("cls");
-            printf("Executing option 4.2\n");
+            Option4(2);
+            creationOfTables = 0;
         } else if (option == 51 && creationOfTables) {      // Execute option 5.1 of the menu
             system("cls");
             Option5(1);
+            creationOfTables = 0;
         } else if (option == 52 && creationOfTables) {      // Execute option 5.2 of the menu
             system("cls");
             Option5(2);
+            creationOfTables = 0;
         } else if (option == 0) {                           // Execute option 0 of the menu
             system("cls");
             SetColor(4);

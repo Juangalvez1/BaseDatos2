@@ -386,9 +386,6 @@ void CreateTablesWithDataset(){
     CreateCustomersTable("Customers.csv");
     CreateStoresTable("Stores.csv");
     CreateProductsTable("Products.csv");
-    system("cls");
-    SetColor(9);
-    printf("\nTables Created Succesfully\n");
 }
 
 
