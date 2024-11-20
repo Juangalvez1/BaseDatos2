@@ -25,7 +25,7 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 	char customerName[40] = "";	  // Used to store the ProductName of each Product in ProductsTable
 	unsigned int customerKey = 0; // Used to store the ProductKey of each Product in ProductTable
 
-	for (int i = 0; i < numOfCustomers; i += 1)
+	for (int i = 0; i < numOfCustomers ; i += 1)
 	{
 		fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
 		fread(&recordCustomer, sizeof(Customers), 1, fpCustomers);
@@ -34,7 +34,6 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 		printf("\nCustomer name: %-40s", customerName);
 
 		customerKey = recordCustomer.CustomerKey;
-		printf("%u\n", customerKey);
 		int positionSales = BinarySearch(fpSales, customerKey, 4);
 		if (positionSales == -1)
 		{
@@ -246,10 +245,10 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 						fseek(fpExchangeRates, sizeof(ExchangeRates) * index, SEEK_SET);
 						fread(&recordExchange, sizeof(ExchangeRates), 1, fpExchangeRates);
 						fseek(fpTemporalExchange, sizeof(ExchangeRates) * i, SEEK_SET);
-						fwrite(&recordExchange, sizeof(ExchangeRates), 1, fpExchangeRates);
+						fwrite(&recordExchange, sizeof(ExchangeRates), 1, fpTemporalExchange);
 						// printf("date:%s   currency:%s exchange:%f \n", recordExchange.Date, recordExchange.Currency, recordExchange.Exchange);
 					}
-
+                  /*
 					if (typeofSort == 1)
 					{
 						ExchangeRates reg1, reg2;
@@ -274,36 +273,36 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 					else if (typeofSort == 2)
 					{
 						MergeSortFile(fpTemporalExchange, 0, 3, sizeof(ExchangeRates), CompareExchangeByCurrencyCode);
-					}
+					}*/
 
 					int indexTemoralExchange = -1;
-					char currentCurrencyCode[3] = "";
-					strcpy(currentCurrencyCode, tempRecordSale1.CurrencyCode);
-					if (strcmp("USD", currentCurrencyCode) == 0)
+					if (tempRecordSale1.CurrencyCode[0] == 'U')
 					{
 						indexTemoralExchange = 0;
 					}
-					else if (strcmp("CAD", currentCurrencyCode) == 0)
+					else if (tempRecordSale1.CurrencyCode[0] == 'C')
 					{
 						indexTemoralExchange = 1;
 					}
-					else if (strcmp("AUD", currentCurrencyCode) == 0)
+					else if (tempRecordSale1.CurrencyCode[0] == 'A')
 					{
 						indexTemoralExchange = 2;
 					}
-					else if (strcmp("EUR", currentCurrencyCode) == 0)
+					else if (tempRecordSale1.CurrencyCode[0] == 'E')
 					{
 						indexTemoralExchange = 3;
 					}
-					else if (strcmp("GBP", currentCurrencyCode) == 0)
+					else if (tempRecordSale1.CurrencyCode[0] == 'G')
 					{
 						indexTemoralExchange = 4;
 					}
 					fseek(fpTemporalExchange, sizeof(ExchangeRates) * indexTemoralExchange, SEEK_SET);
 					fread(&recordExchange, sizeof(ExchangeRates), 1, fpTemporalExchange);
-
+                    ExchangeRates verificationRates;
+                
 					exchange = recordExchange.Exchange;
-
+					//printf("\n fecha : %s     exchange: %f\n", recordExchange.Date ,  exchange);
+                   
 					fclose(fpTemporalExchange);
 				}
 
