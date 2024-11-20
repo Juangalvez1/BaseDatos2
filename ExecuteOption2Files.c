@@ -87,10 +87,10 @@ void DeterminateCustomersLocation(FILE *fpProducts, FILE *fpSales, FILE *fpCusto
 
 				index++;
 			}
-			Customers reg1, reg2;
 			if(typeofSort == 1){ //Executing option 2.1
 				for ( int step = 0; step < numOfBuyers - 1; step += 1 ){
 					//printf("\nSort Customers %i", step + 1);
+					Customers reg1, reg2;
     				for ( int i = 0; i < numOfBuyers - step - 1; i += 1 ){
 						// Leer reg1 (registro actual)
         				fseek(fpTemporal, i * sizeof(Customers), SEEK_SET);
@@ -208,45 +208,48 @@ void BubbleSortOption2(){
 	}
 
 
-	for (int step = 0; step < numRecordsCustomers - 1; step += 1){
+	for (int step = 0; step < numRecordsCustomers - 1; step += 1) {
 		Customers reg1, reg2;
-		printf("Ordena Customers: %i\n", step + 1);
-		for (int i = 0; i < numRecordsCustomers - step - 1; i += 1){
-			fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
-			fread(&reg1, sizeof(Customers), 1, fpCustomers);
+        printf("Ordena Customers: %i\n", step + 1);
+        for (int i = 0; i < numRecordsCustomers - step - 1; i += 1) {
+            fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
+            fread(&reg1, sizeof(Customers), 1, fpCustomers);
 
-			fseek(fpCustomers, sizeof(Customers) * (i + 1), SEEK_SET);
-			fread(&reg2, sizeof(Customers), 1, fpCustomers);
+            fseek(fpCustomers, sizeof(Customers) * (i + 1), SEEK_SET);
+            fread(&reg2, sizeof(Customers), 1, fpCustomers);
 
-			if(reg1.CustomerKey > reg2.CustomerKey){
-				fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
-				fread(&reg2, sizeof(Customers), 1, fpCustomers);
+            if (reg1.CustomerKey > reg2.CustomerKey) {
+                // Intercambiar los registros si están fuera de orden
+                fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
+                fwrite(&reg2, sizeof(Customers), 1, fpCustomers);
 
-				fseek(fpCustomers, sizeof(Customers) * (i + 1), SEEK_SET);
-				fread(&reg1, sizeof(Customers), 1, fpCustomers);
-			}
-		}
-	}
+                fseek(fpCustomers, sizeof(Customers) * (i + 1), SEEK_SET);
+                fwrite(&reg1, sizeof(Customers), 1, fpCustomers);
+            }
+        }
+    }
 
 	
-	for (int step = 0; step < numRecordsSales - 1; step += 1){
+	for (int step = 0; step < numRecordsSales - 1; step += 1) {
+        printf("Ordena Sales: %i\n", step + 1);
 		Sales reg1, reg2;
-		printf("Ordena Sales: %i\n", step + 1);
-		for (int i = 0; i < numRecordsSales - step - 1; i += 1){
-			fseek(fpSales, sizeof(Sales) * i, SEEK_SET);
-			fread(&reg1, sizeof(Sales), 1, fpSales);
+        for (int i = 0; i < numRecordsSales - step - 1; i += 1) {
+            fseek(fpSales, sizeof(Sales) * i, SEEK_SET);
+            fread(&reg1, sizeof(Sales), 1, fpSales);
 
-			fseek(fpSales, sizeof(Sales) * (i + 1), SEEK_SET);
-			fread(&reg2, sizeof(Sales), 1, fpSales);
-			if(reg1.ProductKey > reg2.ProductKey){
-				fseek(fpSales, sizeof(Sales) * i, SEEK_SET);
-				fwrite(&reg2, sizeof(Sales), 1, fpSales);
+            fseek(fpSales, sizeof(Sales) * (i + 1), SEEK_SET);
+            fread(&reg2, sizeof(Sales), 1, fpSales);
 
-				fseek(fpSales, sizeof(Sales) * (i + 1), SEEK_SET);
-				fwrite(&reg1, sizeof(Sales), 1, fpSales);
-			}
-		}
-	}
+            if (reg1.ProductKey > reg2.ProductKey) {
+                // Intercambiar los registros si estan fuera de orden
+                fseek(fpSales, sizeof(Sales) * i, SEEK_SET);
+                fwrite(&reg2, sizeof(Sales), 1, fpSales);
+
+                fseek(fpSales, sizeof(Sales) * (i + 1), SEEK_SET);
+                fwrite(&reg1, sizeof(Sales), 1, fpSales);
+            }
+        }
+    }
 
 	DeterminateCustomersLocation(fpProducts, fpSales, fpCustomers, numRecordsProducts, 1);
 

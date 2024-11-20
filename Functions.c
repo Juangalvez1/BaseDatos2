@@ -458,9 +458,8 @@ int BinarySearchExchangeDate(FILE *fp, Sales recordSale){
         fseek(fp, middle * sizeOfRecord, SEEK_SET);
         fread(&record, sizeOfRecord, 1, fp);
 
-        char key[11] = "", currencyCode[3] = "";
+        char key[11] = "";
         strcpy(key, record.Date);
-        strcpy(currencyCode, record.Currency);
 
         //printf("Start: %u, Middle: %u, End: %u, Clave: '%s', Buscando: %d/%d/%d ", start, middle, end, key, recordSale.OrderDate.MM, recordSale.OrderDate.DD, recordSale.OrderDate.AAAA);
         //printf(",KeyAux: %s\n", keyAux);
@@ -569,6 +568,12 @@ int CompareSalesByOrderNumber(void *a, void *b){
         return (int)(saleA->ProductKey - saleB->ProductKey);
     }
     
+}
+
+int CompareExchangeByCurrencyCode(void *a, void *b){
+    ExchangeRates * exchanA = (ExchangeRates *) a;
+    ExchangeRates * exchanB = (ExchangeRates *) b;
+    return strcmp(exchanA->Currency, exchanB->Currency);
 }
 
 

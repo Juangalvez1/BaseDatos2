@@ -171,9 +171,11 @@ int main() {
             system("cls");
             Option5(2);
         } else if (option == 0) {                           // Execute option 0 of the menu
+            system("cls");
             SetColor(4);
             printf("Exiting the program...\n");
         } else {                                            // Invalid Input
+            system("cls");
             SetColor(13);
             printf("Invalid option. Please try again.\n");
             SetColor(7);
