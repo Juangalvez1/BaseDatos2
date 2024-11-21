@@ -189,7 +189,7 @@ void BubbleSortOption2(){
 
 	for (int step = 0; step < numRecordsProducts - 1; step += 1){
 		Products reg1, reg2;
-		printf("Ordena Products: %i\n", step + 1);
+		//printf("Ordena Products: %i\n", step + 1);
 		for (int i = 0; i < numRecordsProducts - step - 1; i += 1){
 			fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
 			fread(&reg1, sizeof(Products), 1, fpProducts);
@@ -210,7 +210,7 @@ void BubbleSortOption2(){
 
 	for (int step = 0; step < numRecordsCustomers - 1; step += 1) {
 		Customers reg1, reg2;
-        printf("Ordena Customers: %i\n", step + 1);
+        //printf("Ordena Customers: %i\n", step + 1);
         for (int i = 0; i < numRecordsCustomers - step - 1; i += 1) {
             fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
             fread(&reg1, sizeof(Customers), 1, fpCustomers);
@@ -231,7 +231,7 @@ void BubbleSortOption2(){
 
 	
 	for (int step = 0; step < numRecordsSales - 1; step += 1) {
-        printf("Ordena Sales: %i\n", step + 1);
+        //printf("Ordena Sales: %i\n", step + 1);
 		Sales reg1, reg2;
         for (int i = 0; i < numRecordsSales - step - 1; i += 1) {
             fseek(fpSales, sizeof(Sales) * i, SEEK_SET);

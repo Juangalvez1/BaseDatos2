@@ -3,9 +3,9 @@
 #include <string.h>
 #include "Functions.h"
 
-//Salvedad
+//Salvedad: No hay fechas de entrega para las tiendas fisicas, por ende no se pueden comparar contra las fechas de entrega 
 
-void CalculateAverageDeliveryTime(FILE *fpSales, int numOfSales){
+void CalculateAverageDeliveryTime(FILE *fpSales, int numOfSales, char sortType[]){
     FILE *fpTemporalSales = fopen("TemporalFileSalesOption4", "wb+");
     Sales recordsSales;
     int numOfDeliveredSales = 0;
@@ -46,15 +46,46 @@ void CalculateAverageDeliveryTime(FILE *fpSales, int numOfSales){
         }
     }
 
-    for(int i = 0; i < 6; i += 1){
-        printf("\nAverage Delivery time in %i:\t%.2f\n", i + 2016, (1.0 * averageDeliveryTime[i][0]) / (1.0 * averageDeliveryTime[i][1]));
-    }
+    //for(int i = 0; i < 6; i += 1){
+    //    printf("\nAverage Delivery time in %i:\t%.2f\n", i + 2016, (1.0 * averageDeliveryTime[i][0]) / (1.0 * averageDeliveryTime[i][1]));
+    //}
 
-    printf("\nIn the given DataSet of information, theres no record of a physical store with deliveryDate.\nTherefore, we can compare the delivery time of the online store, and the rest of the local stores.\n");
+    //printf("\nIn the given DataSet of information, theres no record of a physical store with deliveryDate.\nTherefore, we can't compare the delivery time of the online store, and the rest of the local stores.\n");
+
+    printf("\nOver the years analyzed, a progressive decrease in delivery times is observed, suggesting that both\nlocal and online stores have managed to improve their delivery efficiency over time.\n\n");
+
+    // Conclusión del análisis
+    
+
+    printf("\nIn this project, the average delivery time of orders has been calculated using the available dataset,\nwhich includes the order creation and delivery dates. To achieve this, the %s Sort algorithm was incluye\nimplemented to sort the delivery dates in ascending order, allowing for an accurate analysis of the\ntime elapsed between the order placement and its delivery.\n\n", sortType);
+    
+    printf("Once the data was sorted by delivery date, the average delivery time in days was calculated, which\nrefers to the average number of days between the order date and the delivery date. This calculation\nis crucial to understand the efficiency of delivery times based on the provided data.\n\n");
+    
+    printf("It is important to note that, in the analyzed dataset, there are no records of physical stores with a\ndelivery date. Therefore, the comparison was made only between online store that\ndo have valid delivery date records.\n\n");
+
+    // Resultados de los tiempos promedio de entrega por año
+    SetColor(3);
+    printf("Results:\n\n");
+    SetColor(7);
+    printf("After analyzing the data, the following results were obtained for the average delivery time in days:\n\n");
+    
+    for(int i = 0; i < 6; i += 1){
+        printf("\n\tAverage delivery time in: %i:\t%.2f days\n", i + 2016, (1.0 * averageDeliveryTime[i][0]) / (1.0 * averageDeliveryTime[i][1]));
+    }
+    
+    printf("\n\nOver the years analyzed, a progressive decrease in delivery times is observed, suggesting that \nthe online store has managed to improve its delivery efficiency over time.\n\n");
+
+    // Conclusión del análisis
+    SetColor(3);
+    printf("Conclusion:\n\n");
+    SetColor(7);
+    printf("In the provided dataset, there are no records for physical stores with delivery dates, so the analysis\nhas been limited to online stores. The calculation of average delivery time shows a trend of\nimprovement over the years, with a significant reduction in average delivery time, from 7.25 days in\n2016 to 3.76 days in 2021.\n\n");
+    
+    printf("This analysis highlights how, over time, delivery processes have improved, which may reflect\noptimization in logistical systems or operational efficiency in both online and local stores.\n\n");
+
 
     fclose(fpTemporalSales);
 }
-
 
 
 void BubbleSortOption4(){
@@ -89,7 +120,7 @@ void BubbleSortOption4(){
         }
     }
 
-    CalculateAverageDeliveryTime(fpSales, numRecordsSales);
+    CalculateAverageDeliveryTime(fpSales, numRecordsSales, "Bubble");
 
     fclose(fpSales);
 }
@@ -105,9 +136,8 @@ void MergeSortOption4(){
 	}
 	
 	MergeSortFile(fpSales, 0, numRecordsSales - 1, sizeof(Sales), CompareSalesByCustomerKey);
-	
 
-	CalculateAverageDeliveryTime(fpSales, numRecordsSales);
+	CalculateAverageDeliveryTime(fpSales, numRecordsSales, "Merge");
 
     fclose(fpSales);
 }

@@ -330,9 +330,9 @@ void BubbleSortOption5(){
 }
 
 void MergeSortOption5(){
-	int numRecordsCustomers = TellNumRecords("CustomersTable", sizeof(Customers)); 	//Quantity of products in CustomersTable
-	int numRecordsSales = TellNumRecords("SalesTable", sizeof(Sales)); 				//Quantity of products in SalesTable
-	int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Sales)); 		//Quantity of products in ProductsTable
+	int numRecordsCustomers = TellNumRecords("CustomersTable", sizeof(Customers)); 		//Quantity of products in CustomersTable
+	int numRecordsSales = TellNumRecords("SalesTable", sizeof(Sales)); 					//Quantity of products in SalesTable
+	int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); 		//Quantity of products in ProductsTable
 
 
     FILE *fpCustomers = fopen("CustomersTable", "rb+");	//Pointer to CustomersTable
