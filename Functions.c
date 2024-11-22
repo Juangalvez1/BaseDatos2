@@ -458,7 +458,7 @@ int BinarySearchExchangeDate(FILE *fp, Sales recordSale){
         char key[11] = "";
         strcpy(key, record.Date);
 
-        //printf("Start: %u, Middle: %u, End: %u, Clave: '%s', Buscando: %d/%d/%d ", start, middle, end, key, recordSale.OrderDate.MM, recordSale.OrderDate.DD, recordSale.OrderDate.AAAA);
+        //printf("Start: %u, Middle: %u, End: %u, Clave: '%s', Buscando: %d/%d/%d\n", start, middle, end, key, recordSale.OrderDate.MM, recordSale.OrderDate.DD, recordSale.OrderDate.AAAA);
         //printf(",KeyAux: %s\n", keyAux);
         
         int currentMonth = 0, currentDay = 0, currentYear = 0;

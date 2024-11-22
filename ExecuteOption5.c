@@ -13,11 +13,10 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 	FILE *fpExchangeRates = NULL;
 	FILE *fpTemporalSales = NULL;
 
-    char customerName[40] = ""; 		
-					//Used to store the ProductName of each Product in ProductsTable
+    char customerName[40] = ""; 		//Used to store the ProductName of each Product in ProductsTable
 	unsigned int customerKey = 0; 						//Used to store the ProductKey of each Product in ProductTable
 
-    for(int i = 0; i < numOfCustomers; i += 1){
+    for(int i = 0; i < numOfCustomers && i < 100; i += 1){
         fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
     	fread(&recordCustomer, sizeof(Customers), 1, fpCustomers);
 
@@ -69,6 +68,7 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 					orderNumber = recordSale.OrderNumber;
 				}
             }
+
 
 			if(typeofSort == 1){
 				for(int step = 0; step < totalNumOfPurchases - 1; step += 1){
@@ -123,7 +123,7 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 					fseek(fpExchangeRates, sizeof(ExchangeRates) * positionExchange, SEEK_SET);
 					fread(&staticExchangeRecord, sizeof(ExchangeRates), 1, fpExchangeRates);
 					int index = positionExchange;
-					// printf("DATE:%s   currency:%s \n", staticExchangeRecord.Date, staticExchangeRecord.Currency);
+					//printf("DATE:%s   currency:%s \n", staticExchangeRecord.Date, staticExchangeRecord.Currency);
 					if (strcmp("USD", staticExchangeRecord.Currency) != 0){
 						fseek(fpExchangeRates, sizeof(ExchangeRates) * positionExchange, SEEK_SET);
 						fread(&recordExchange, sizeof(ExchangeRates), 1, fpExchangeRates);
@@ -134,14 +134,14 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 						index++;
 					}
 
-					// printf("date:%s   currency:%s" , recordExchange.Date , recordExchange.Currency );
+					//printf("\tdate:%s   currency:%s\n" , recordExchange.Date , recordExchange.Currency );
 					FILE *fpTemporalExchange = tmpfile();
 					for (int i = 0; i < 5; i++, index++){
 						fseek(fpExchangeRates, sizeof(ExchangeRates) * index, SEEK_SET);
 						fread(&recordExchange, sizeof(ExchangeRates), 1, fpExchangeRates);
 						fseek(fpTemporalExchange, sizeof(ExchangeRates) * i, SEEK_SET);
 						fwrite(&recordExchange, sizeof(ExchangeRates), 1, fpTemporalExchange);
-						// printf("date:%s   currency:%s exchange:%f \n", recordExchange.Date, recordExchange.Currency, recordExchange.Exchange);
+						//printf("date:%s   currency:%s exchange:%f \n", recordExchange.Date, recordExchange.Currency, recordExchange.Exchange);
 					}
 
 					int indexTemoralExchange = -1;
@@ -175,7 +175,7 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 			           tempRecordSale1.OrderDate.AAAA, tempRecordSale1.OrderDate.MM, tempRecordSale1.OrderDate.DD, 
 			           tempRecordSale1.OrderNumber);
 				printf("%-17s%-100s%-15s%s %s", "ProductKey", "ProductName", "Quantity", "Value", tempRecordSale1.CurrencyCode);
-			    printf("_________________________________________________________________________________________________________________________________________________________\n");
+			    printf("\n_________________________________________________________________________________________________________________________________________________________\n");
 
 			    float subTotal = 0.0;
 			    Products tempProductRecord;
@@ -186,6 +186,7 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 
 			        // Buscar el producto en el archivo de productos
 			        int positionProducts = BinarySearch(fpProducts, productKey, 1);
+					printf("Salio binary.\n");
 			        if (positionProducts != -1) {
 			            fseek(fpProducts, sizeof(Products) * positionProducts, SEEK_SET);
 			            fread(&tempProductRecord, sizeof(Products), 1, fpProducts);
@@ -257,7 +258,8 @@ void BubbleSortOption5(){
 		printf("Error opening the 'SalesTable' File");
 		return;
 	}
-
+	
+	
 	for (int step = 0; step < numRecordsProducts - 1; step += 1){
 		Products reg1, reg2;
 		printf("Ordena Products: %i\n", step + 1);
@@ -321,6 +323,7 @@ void BubbleSortOption5(){
             }
         }
     }
+	
 
 	ShowCustomersPurchases(fpSales, fpCustomers, fpProducts, numRecordsCustomers, 1);
 

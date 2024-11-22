@@ -5,7 +5,7 @@
 
 //Salvedad: No hay fechas de entrega para las tiendas fisicas, por ende no se pueden comparar contra las fechas de entrega 
 
-void CalculateAverageDeliveryTime(FILE *fpSales, int numOfSales, char sortType[]){
+void CalculateAverageDeliveryTime(FILE *fpSales, int numOfSales){
     FILE *fpTemporalSales = fopen("TemporalFileSalesOption4", "wb+");
     Sales recordsSales;
     int numOfDeliveredSales = 0;
@@ -46,20 +46,11 @@ void CalculateAverageDeliveryTime(FILE *fpSales, int numOfSales, char sortType[]
         }
     }
 
-    //for(int i = 0; i < 6; i += 1){
-    //    printf("\nAverage Delivery time in %i:\t%.2f\n", i + 2016, (1.0 * averageDeliveryTime[i][0]) / (1.0 * averageDeliveryTime[i][1]));
-    //}
-
-    //printf("\nIn the given DataSet of information, theres no record of a physical store with deliveryDate.\nTherefore, we can't compare the delivery time of the online store, and the rest of the local stores.\n");
-
     printf("\nOver the years analyzed, a progressive decrease in delivery times is observed, suggesting that both\nlocal and online stores have managed to improve their delivery efficiency over time.\n\n");
 
     // Conclusión del análisis
     
-
-    printf("\nIn this project, the average delivery time of orders has been calculated using the available dataset,\nwhich includes the order creation and delivery dates. To achieve this, the %s Sort algorithm was incluye\nimplemented to sort the delivery dates in ascending order, allowing for an accurate analysis of the\ntime elapsed between the order placement and its delivery.\n\n", sortType);
-    
-    printf("Once the data was sorted by delivery date, the average delivery time in days was calculated, which\nrefers to the average number of days between the order date and the delivery date. This calculation\nis crucial to understand the efficiency of delivery times based on the provided data.\n\n");
+    printf("The average delivery time in days was calculated, which\nrefers to the average number of days between the order date and the delivery date. This calculation\nis crucial to understand the efficiency of delivery times based on the provided data.\n\n");
     
     printf("It is important to note that, in the analyzed dataset, there are no records of physical stores with a\ndelivery date. Therefore, the comparison was made only between online store that\ndo have valid delivery date records.\n\n");
 
@@ -98,7 +89,7 @@ void BubbleSortOption4(){
 		return;
 	}
 
-	
+	/*
 	for (int step = 0; step < numRecordsSales - 1; step += 1) {
         printf("Ordena Sales: %i\n", step + 1);
 		Sales reg1, reg2;
@@ -119,8 +110,9 @@ void BubbleSortOption4(){
             }
         }
     }
+    */
 
-    CalculateAverageDeliveryTime(fpSales, numRecordsSales, "Bubble");
+    CalculateAverageDeliveryTime(fpSales, numRecordsSales);
 
     fclose(fpSales);
 }
@@ -135,9 +127,9 @@ void MergeSortOption4(){
 		return;
 	}
 	
-	MergeSortFile(fpSales, 0, numRecordsSales - 1, sizeof(Sales), CompareSalesByCustomerKey);
+	//MergeSortFile(fpSales, 0, numRecordsSales - 1, sizeof(Sales), CompareSalesByCustomerKey);
 
-	CalculateAverageDeliveryTime(fpSales, numRecordsSales, "Merge");
+	CalculateAverageDeliveryTime(fpSales, numRecordsSales);
 
     fclose(fpSales);
 }

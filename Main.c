@@ -23,6 +23,7 @@
 #include <time.h>
 #include "Functions.c"
 #include "ExecuteOption2Files.c"
+#include "ExecuteOption3.c"
 #include "ExecuteOption4.c"
 #include "ExecuteOption5.c"
 
@@ -90,6 +91,32 @@ void Option2(int sortType){
 
     fp = fopen("TemporalFileOption2", "w");
     fclose(fp);
+
+    finish = clock();
+
+    totalSeconds = ((double)(finish - start)) / CLOCKS_PER_SEC;
+    
+    printf("\n---------------------------------------------------------------------------------------");
+    printf("\nTime used to produce this listing: "); 
+    PrintExecutionTime(totalSeconds);
+    printf("\n********************************LAST LINE OF THE REPORT********************************\n");
+}
+
+void Option3(int sortType){
+    int start = 0, finish = 0;
+    double totalSeconds = 0.;
+    start = clock();
+    printf("\n---------------------------------------------------------------------------------------");
+    printf("\nCompany Global Electronics Retailer\n");
+    ShowDateTime();
+    printf("\n");
+
+    if(sortType == 1){
+        BubbleSortOption3();
+    } else if (sortType == 2){
+        MergeSortOption3();
+    }
+
 
     finish = clock();
 
@@ -186,11 +213,11 @@ int main() {
             creationOfTables = 0;
         } else if (option == 31 && creationOfTables) {      // Execute option 3.1 of the menu
             system("cls");
-            printf("Executing option 3.1\n");
+            Option3(1);            
             creationOfTables = 0;
         } else if (option == 32 && creationOfTables) {      // Execute option 3.2 of the menu
             system("cls");
-            printf("Executing option 3.2\n");
+            Option3(2);            
             creationOfTables = 0;
         } else if (option == 41 && creationOfTables) {      // Execute option 4.1 of the menu
             system("cls");
