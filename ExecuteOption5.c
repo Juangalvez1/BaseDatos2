@@ -3,6 +3,18 @@
 #include <string.h>
 #include "Functions.h"
 
+/* 
+    Function: ShowCustomersPurchases
+    Purpose: Displays the purchase history for each customer, including order details, products bought, quantities, and total prices.
+    The purchases are sorted based on the specified sorting method and include currency conversion.
+    Parameters:
+      - fpSales: File pointer to the SalesTable, containing sales data.
+      - fpCustomers: File pointer to the CustomersTable, containing customer data.
+      - fpProducts: File pointer to the ProductsTable, containing product details.
+      - numOfCustomers: Total number of customers to analyze.
+      - typeofSort: Specifies the sorting method (1 for BubbleSort, 2 for MergeSort).
+    Returns: None.
+*/
 void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, int numOfCustomers, int typeofSort){
 	//printf("%i", typeofSort);
 	
@@ -16,7 +28,7 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
     char customerName[40] = ""; 		//Used to store the ProductName of each Product in ProductsTable
 	unsigned int customerKey = 0; 						//Used to store the ProductKey of each Product in ProductTable
 
-    for(int i = 0; i < numOfCustomers && i < 100; i += 1){
+    for(int i = 0; i < numOfCustomers; i += 1){
         fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
     	fread(&recordCustomer, sizeof(Customers), 1, fpCustomers);
 
@@ -237,134 +249,155 @@ void ShowCustomersPurchases(FILE *fpSales, FILE *fpCustomers, FILE *fpProducts, 
 }
 
 
-void BubbleSortOption5(){
-	int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); 	//Quantity of products in ProductsTable
-	int numRecordsCustomers = TellNumRecords("CustomersTable", sizeof(Customers)); 	//Quantity of products in CustomersTable
-	int numRecordsSales = TellNumRecords("SalesTable", sizeof(Sales)); 				//Quantity of products in SalesTable
+/* 
+    Function: BubbleSortOption5
+    Purpose: Sorts the ProductsTable, CustomersTable, and SalesTable using BubbleSort based on specific fields (ProductKey, Customer Name, and CustomerKey). 
+    It then displays customer purchase details.
+    Parameters: None.
+    Returns: None.
+*/
+void BubbleSortOption5() {
+    // Get the number of records in each table.
+    int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); // Number of products in ProductsTable.
+    int numRecordsCustomers = TellNumRecords("CustomersTable", sizeof(Customers)); // Number of customers in CustomersTable.
+    int numRecordsSales = TellNumRecords("SalesTable", sizeof(Sales)); // Number of sales in SalesTable.
 
-	FILE *fpProducts = fopen("ProductsTable", "rb+");	//Pointer to ProductsTable
-    FILE *fpCustomers = fopen("CustomersTable", "rb+");	//Pointer to CustomersTable
-    FILE *fpSales = fopen("SalesTable", "rb+");			//Pointer to SalesTable	
+    // Open the respective files for reading and writing.
+    FILE *fpProducts = fopen("ProductsTable", "rb+");  // Pointer to ProductsTable.
+    FILE *fpCustomers = fopen("CustomersTable", "rb+"); // Pointer to CustomersTable.
+    FILE *fpSales = fopen("SalesTable", "rb+");  // Pointer to SalesTable.
 
-	if (fpProducts == NULL){
-		printf("Error opening the 'ProductsTable' File");
-		return;
-	}
-	if (fpCustomers == NULL){
-		printf("Error opening the 'CustomersTable' File");
-		return;
-	}
-	if (fpSales == NULL){
-		printf("Error opening the 'SalesTable' File");
-		return;
-	}
-	
-	
-	for (int step = 0; step < numRecordsProducts - 1; step += 1){
-		Products reg1, reg2;
-		printf("Ordena Products: %i\n", step + 1);
-		for (int i = 0; i < numRecordsProducts - step - 1; i += 1){
-			fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
-			fread(&reg1, sizeof(Products), 1, fpProducts);
+    // Check if files are opened successfully.
+    if (fpProducts == NULL) {
+        printf("Error opening the 'ProductsTable' File");
+        return;
+    }
+    if (fpCustomers == NULL) {
+        printf("Error opening the 'CustomersTable' File");
+        return;
+    }
+    if (fpSales == NULL) {
+        printf("Error opening the 'SalesTable' File");
+        return;
+    }
 
-			fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET);
-			fread(&reg2, sizeof(Products), 1, fpProducts);
+    // Perform BubbleSort on ProductsTable based on ProductKey.
+    for (int step = 0; step < numRecordsProducts - 1; step++) {
+        Products reg1, reg2;
+        printf("Sorting Products: %i\n", step + 1);
+        for (int i = 0; i < numRecordsProducts - step - 1; i++) {
+            fseek(fpProducts, sizeof(Products) * i, SEEK_SET);  // Move to the i-th product.
+            fread(&reg1, sizeof(Products), 1, fpProducts);  // Read the i-th product.
 
-			if(reg1.ProductKey > reg2.ProductKey){
-				fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
-				fwrite(&reg2, sizeof(Products), 1, fpProducts);
+            fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET);  // Move to the next product.
+            fread(&reg2, sizeof(Products), 1, fpProducts);  // Read the (i+1)-th product.
 
-				fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET);
-				fwrite(&reg1, sizeof(Products), 1, fpProducts);
-			}
-		}
-	}
+            // Compare and swap if needed.
+            if (reg1.ProductKey > reg2.ProductKey) {
+                fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
+                fwrite(&reg2, sizeof(Products), 1, fpProducts);
+                fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET);
+                fwrite(&reg1, sizeof(Products), 1, fpProducts);
+            }
+        }
+    }
 
+    // Perform BubbleSort on CustomersTable based on customer names.
+    for (int step = 0; step < numRecordsCustomers - 1; step++) {
+        Customers reg1, reg2;
+        printf("Sorting Customers: %i\n", step + 1);
+        for (int i = 0; i < numRecordsCustomers - step - 1; i++) {
+            fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);  // Move to the i-th customer.
+            fread(&reg1, sizeof(Customers), 1, fpCustomers);  // Read the i-th customer.
 
-	for (int step = 0; step < numRecordsCustomers - 1; step += 1) {
-		Customers reg1, reg2;
-        printf("Ordena Customers: %i\n", step + 1);
-        for (int i = 0; i < numRecordsCustomers - step - 1; i += 1) {
-            fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
-            fread(&reg1, sizeof(Customers), 1, fpCustomers);
+            fseek(fpCustomers, sizeof(Customers) * (i + 1), SEEK_SET);  // Move to the next customer.
+            fread(&reg2, sizeof(Customers), 1, fpCustomers);  // Read the (i+1)-th customer.
 
-            fseek(fpCustomers, sizeof(Customers) * (i + 1), SEEK_SET);
-            fread(&reg2, sizeof(Customers), 1, fpCustomers);
-
+            // Compare and swap if needed.
             if (strcmp(reg1.Name, reg2.Name) > 0) {
-                // Intercambiar los registros si están fuera de orden
                 fseek(fpCustomers, sizeof(Customers) * i, SEEK_SET);
                 fwrite(&reg2, sizeof(Customers), 1, fpCustomers);
-
                 fseek(fpCustomers, sizeof(Customers) * (i + 1), SEEK_SET);
                 fwrite(&reg1, sizeof(Customers), 1, fpCustomers);
             }
         }
     }
 
-	
-	for (int step = 0; step < numRecordsSales - 1; step += 1) {
-        printf("Ordena Sales: %i\n", step + 1);
-		Sales reg1, reg2;
-        for (int i = 0; i < numRecordsSales - step - 1; i += 1) {
-            fseek(fpSales, sizeof(Sales) * i, SEEK_SET);
-            fread(&reg1, sizeof(Sales), 1, fpSales);
+    // Perform BubbleSort on SalesTable based on CustomerKey.
+    for (int step = 0; step < numRecordsSales - 1; step++) {
+        printf("Sorting Sales: %i\n", step + 1);
+        Sales reg1, reg2;
+        for (int i = 0; i < numRecordsSales - step - 1; i++) {
+            fseek(fpSales, sizeof(Sales) * i, SEEK_SET);  // Move to the i-th sale.
+            fread(&reg1, sizeof(Sales), 1, fpSales);  // Read the i-th sale.
 
-            fseek(fpSales, sizeof(Sales) * (i + 1), SEEK_SET);
-            fread(&reg2, sizeof(Sales), 1, fpSales);
+            fseek(fpSales, sizeof(Sales) * (i + 1), SEEK_SET);  // Move to the next sale.
+            fread(&reg2, sizeof(Sales), 1, fpSales);  // Read the (i+1)-th sale.
 
+            // Compare and swap if needed.
             if (reg1.CustomerKey > reg2.CustomerKey) {
-                // Intercambiar los registros si estan fuera de orden
                 fseek(fpSales, sizeof(Sales) * i, SEEK_SET);
                 fwrite(&reg2, sizeof(Sales), 1, fpSales);
-
                 fseek(fpSales, sizeof(Sales) * (i + 1), SEEK_SET);
                 fwrite(&reg1, sizeof(Sales), 1, fpSales);
             }
         }
     }
-	
 
-	ShowCustomersPurchases(fpSales, fpCustomers, fpProducts, numRecordsCustomers, 1);
+    // Display the sorted customer purchase details.
+    ShowCustomersPurchases(fpSales, fpCustomers, fpProducts, numRecordsCustomers, 1);
 
+    // Close the file pointers after the operation is completed.
     fclose(fpProducts);
     fclose(fpCustomers);
     fclose(fpSales);
 }
 
-void MergeSortOption5(){
-	int numRecordsCustomers = TellNumRecords("CustomersTable", sizeof(Customers)); 		//Quantity of products in CustomersTable
-	int numRecordsSales = TellNumRecords("SalesTable", sizeof(Sales)); 					//Quantity of products in SalesTable
-	int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); 		//Quantity of products in ProductsTable
+/* 
+    Function: MergeSortOption5
+    Purpose: Sorts the ProductsTable, CustomersTable, and SalesTable using MergeSort based on specific fields (ProductKey, Customer Name, and CustomerKey). 
+    It then displays customer purchase details.
+    Parameters: None.
+    Returns: None.
+*/
+void MergeSortOption5() {
+    // Get the number of records in each table.
+    int numRecordsCustomers = TellNumRecords("CustomersTable", sizeof(Customers)); // Number of customers in CustomersTable.
+    int numRecordsSales = TellNumRecords("SalesTable", sizeof(Sales)); // Number of sales in SalesTable.
+    int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); // Number of products in ProductsTable.
 
+    // Open the respective files for reading and writing.
+    FILE *fpCustomers = fopen("CustomersTable", "rb+"); // Pointer to CustomersTable.
+    FILE *fpSales = fopen("SalesTable", "rb+"); // Pointer to SalesTable.
+    FILE *fpProducts = fopen("ProductsTable", "rb+"); // Pointer to ProductsTable.
 
-    FILE *fpCustomers = fopen("CustomersTable", "rb+");	//Pointer to CustomersTable
-    FILE *fpSales = fopen("SalesTable", "rb+");			//Pointer to SalesTable	
-    FILE *fpProducts = fopen("ProductsTable", "rb+");
+    // Check if files are opened successfully.
+    if (fpProducts == NULL) {
+        printf("Error opening the 'ProductsTable' File");
+        return;
+    }
+    if (fpCustomers == NULL) {
+        printf("Error opening the 'CustomersTable' File");
+        return;
+    }
+    if (fpSales == NULL) {
+        printf("Error opening the 'SalesTable' File");
+        return;
+    }
 
-	if(fpProducts == NULL){
-		printf("Error opening the 'ProductsTable' File");
-		return;
-	}
-	if (fpCustomers == NULL){
-		printf("Error opening the 'CustomersTable' File");
-		return;
-	}
-	if (fpSales == NULL){
-		printf("Error opening the 'SalesTable' File");
-		return;
-	}
+    // Perform MergeSort on CustomersTable based on Name.
+    MergeSortFile(fpCustomers, 0, numRecordsCustomers - 1, sizeof(Customers), CompareCustomersByName);
 
+    // Perform MergeSort on SalesTable based on CustomerKey.
+    MergeSortFile(fpSales, 0, numRecordsSales - 1, sizeof(Sales), CompareSalesByCustomerKey);
 
-	MergeSortFile(fpCustomers, 0, numRecordsCustomers - 1, sizeof(Customers), CompareCustomersByName);
+    // Perform MergeSort on ProductsTable based on ProductKey.
+    MergeSortFile(fpProducts, 0, numRecordsProducts - 1, sizeof(Products), CompareProductsByProductKey);
 
-	MergeSortFile(fpSales, 0, numRecordsSales - 1, sizeof(Sales), CompareSalesByCustomerKey);
+    // Display the sorted customer purchase details.
+    ShowCustomersPurchases(fpSales, fpCustomers, fpProducts, numRecordsCustomers, 2);
 
-	MergeSortFile(fpProducts, 0, numRecordsProducts - 1, sizeof(Products), CompareProductsByProductKey); //To MergeSortArray the ProductsTable File
-
-
-	ShowCustomersPurchases(fpSales, fpCustomers, fpProducts, numRecordsCustomers, 2);
-
+    // Close the file pointers after the operation is completed.
     fclose(fpCustomers);
     fclose(fpSales);
     fclose(fpProducts);

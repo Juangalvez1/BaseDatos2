@@ -4,64 +4,104 @@
 #include <math.h>
 #include "Functions.h"
 
-void Graph(char pantalla[24][56], float array[12]){
-    float arrAux[12] = {0.0};
+/* 
+    Function: Graph
+    Purpose: Renders a graph representation of a given dataset in a 2D character array.
+    Parameters:
+      - pantalla: A 24x56 2D character array where the graph will be drawn.
+      - array: An array of 12 float values representing the data points to be plotted.
+    Returns: None.
+*/
+void Graph(char pantalla[24][56], float array[12]) {
+    float arrAux[12] = {0.0}; // Auxiliary array to modify data without altering the original.
+    
+    // Copy data to the auxiliary array for processing.
     for (int i = 0; i < 12; i++) {
         arrAux[i] = array[i];
     }
-    double yMax = arrAux[0];
-    if((int)yMax / 1000000 >= 1){
-        for(int i = 0; i < 12; i++){
+
+    double yMax = arrAux[0]; // Variable to track the maximum value in the array.
+
+    // Scale values if the maximum value is in millions.
+    if ((int)yMax / 1000000 >= 1) {
+        for (int i = 0; i < 12; i++) {
             arrAux[i] = arrAux[i] / 1000000;
         }
         yMax = arrAux[0];
     }
     
-    for(int i = 0; i < 12; i++){
-        if(arrAux[i] > yMax){
+    // Update yMax to the highest value in the array.
+    for (int i = 0; i < 12; i++) {
+        if (arrAux[i] > yMax) {
             yMax = arrAux[i];
         }
     }
-    double pixelY = (fabs(yMax) == 0) ? 24 :  24.0 / fabs(yMax);
 
-    for(int i = 0; i < 24; i++){
-        pantalla[i][9] = 179;
+    // Calculate the number of pixels per unit of Y-axis.
+    double pixelY = (fabs(yMax) == 0) ? 24 : 24.0 / fabs(yMax);
+
+    // Draw the Y-axis line.
+    for (int i = 0; i < 24; i++) {
+        pantalla[i][9] = 179; // ASCII code for vertical line.
     }
-    for(int i = 9; i < 56; i++){
-        if(i != 9){
-            pantalla[23][i] = 196;
-        }else{
-            pantalla[23][i] = 197;
-        }
+
+    // Draw the X-axis line.
+    for (int i = 9; i < 56; i++) {
+        pantalla[23][i] = (i != 9) ? 196 : 197; // Horizontal line or intersection.
     }
-    for(int i = 0; i < 12; i++){
-        int placeY = (int) 24.0-round(pixelY * arrAux[i]);
-        char cadena[12] = "";
-        sprintf(cadena, "%.2f", arrAux[i]);
-        int longitudCadena = strlen(cadena);
-        for(int j = 0; j < longitudCadena; j++){
-                pantalla[placeY][j] = cadena[j];
+
+    // Plot the data points on the graph.
+    for (int i = 0; i < 12; i++) {
+        int placeY = (int)(24.0 - round(pixelY * arrAux[i])); // Calculate Y-coordinate.
+        char cadena[12] = ""; // Temporary buffer for the numeric string.
+        sprintf(cadena, "%.2f", arrAux[i]); // Convert value to string.
+        int longitudCadena = strlen(cadena); // Length of the numeric string.
+        
+        // Place the numeric value on the graph.
+        for (int j = 0; j < longitudCadena; j++) {
+            pantalla[placeY][j] = cadena[j];
         }
+
+        // Mark the data point with 'x'.
         pantalla[placeY][11 + (4 * i)] = 'x';
     }
-
-    return;
 }
 
+/* 
+    Function: GetProductPrice
+    Purpose: Fetches the unit price of a product based on its product key.
+    Parameters:
+      - productKey: An unsigned short integer representing the unique identifier of the product.
+    Returns: The unit price of the product as a float, or -1.0 if the file could not be opened.
+*/
 float GetProductPrice(unsigned short int productKey) {
+    // Open the ProductsTable file.
     FILE *fpProducts = fopen("ProductsTable", "rb+");
     if (fpProducts == NULL) {
-        printf("Error opening file: ProductsOrder.table\n");
-        return -1.0;
+        printf("Error opening file: ProductsTable\n");
+        return -1.0; // Return error value.
     }
-    Products recordProduct;
+
+    Products recordProduct; // Structure to hold product details.
+    
+    // Use BinarySearch to locate the product in the table.
     int productsIndex = BinarySearch(fpProducts, productKey, 1);
+
+    // Read the product record.
     fseek(fpProducts, productsIndex * sizeof(Products), SEEK_SET);
     fread(&recordProduct, sizeof(Products), 1, fpProducts);
-    fclose(fpProducts);
-    return recordProduct.UnitPriceUSD;
+
+    fclose(fpProducts); // Close the file.
+    return recordProduct.UnitPriceUSD; // Return the unit price.
 }
 
+/* 
+    Function: PrintSeasonalAnalysis
+    Purpose: Analyzes monthly order volumes and income, identifying seasonal patterns in the data.
+    Parameters:
+      - fpSales: A file pointer to the SalesTable file.
+    Returns: None.
+*/
 void PrintSeasonalAnalysis(FILE *fpSales) {
     float monthlyOrders[12] = {0.0};
     float monthlyIncome[12] = {0.0};
@@ -184,77 +224,93 @@ void PrintSeasonalAnalysis(FILE *fpSales) {
 
 }
 
+/* 
+    Function: BubbleSortOption3
+    Purpose: Sorts the ProductsTable using BubbleSort based on ProductKey and prints a seasonal analysis of sales data.
+    Parameters: None.
+    Returns: None.
+*/
+void BubbleSortOption3() {
+    // Get the number of products in the ProductsTable.
+    int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); 
 
-void BubbleSortOption3(){
-	int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); 	//Quantity of products in ProductsTable
-
-	FILE *fpProducts = fopen("ProductsTable", "rb+");	//Pointer to ProductsTable
-    
-    //CreateSalesTable("Sales.csv");
-
+    // Open the ProductsTable and SalesTable files for reading and writing.
+    FILE *fpProducts = fopen("ProductsTable", "rb+"); 
     FILE *fpSales = fopen("SalesTable", "rb+");
 
-	if (fpProducts == NULL){
-		printf("Error opening the 'ProductsTable' File");
-		return;
-	}
-    if(fpSales == NULL){
+    // Check if files are successfully opened.
+    if (fpProducts == NULL) {
+        printf("Error opening the 'ProductsTable' File");
+        return; // Exit function if ProductsTable file can't be opened.
+    }
+    if (fpSales == NULL) {
         printf("Error opening the 'SalesTable' File");
-        return;
+        return; // Exit function if SalesTable file can't be opened.
     }
 
+    // Perform BubbleSort to sort ProductsTable by ProductKey.
+    for (int step = 0; step < numRecordsProducts - 1; step++) {
+        Products reg1, reg2; // Structures to hold two product records for comparison.
+        printf("Sorting Products: %i\n", step + 1); // Print the current sorting step.
+        
+        // Perform BubbleSort on ProductKey field.
+        for (int i = 0; i < numRecordsProducts - step - 1; i++) {
+            fseek(fpProducts, sizeof(Products) * i, SEEK_SET); // Move file pointer to the i-th product.
+            fread(&reg1, sizeof(Products), 1, fpProducts); // Read the i-th product.
 
-	for (int step = 0; step < numRecordsProducts - 1; step += 1){
-		Products reg1, reg2;
-		printf("Ordena Products: %i\n", step + 1);
-		for (int i = 0; i < numRecordsProducts - step - 1; i += 1){
-			fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
-			fread(&reg1, sizeof(Products), 1, fpProducts);
+            fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET); // Move file pointer to the next product.
+            fread(&reg2, sizeof(Products), 1, fpProducts); // Read the (i+1)-th product.
 
-			fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET);
-			fread(&reg2, sizeof(Products), 1, fpProducts);
+            // Compare the ProductKey of two products and swap if necessary.
+            if (reg1.ProductKey > reg2.ProductKey) {
+                fseek(fpProducts, sizeof(Products) * i, SEEK_SET); // Move pointer to i-th product.
+                fwrite(&reg2, sizeof(Products), 1, fpProducts); // Write reg2 to i-th position.
 
-			if(reg1.ProductKey > reg2.ProductKey){
-				fseek(fpProducts, sizeof(Products) * i, SEEK_SET);
-				fwrite(&reg2, sizeof(Products), 1, fpProducts);
+                fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET); // Move pointer to (i+1)-th product.
+                fwrite(&reg1, sizeof(Products), 1, fpProducts); // Write reg1 to (i+1)-th position.
+            }
+        }
+    }
 
-				fseek(fpProducts, sizeof(Products) * (i + 1), SEEK_SET);
-				fwrite(&reg1, sizeof(Products), 1, fpProducts);
-			}
-		}
-	}
+    // Call the function to print seasonal analysis using sales data from SalesTable.
+    PrintSeasonalAnalysis(fpSales);
 
-
-	PrintSeasonalAnalysis(fpSales);
-
+    // Close the file pointers after the operation is completed.
     fclose(fpProducts);
     fclose(fpSales);
 }
 
-void MergeSortOption3(){
-	int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); 	//Quantity of products in ProductsTable
+/* 
+    Function: MergeSortOption3
+    Purpose: Sorts the ProductsTable using MergeSort based on ProductKey and prints a seasonal analysis of sales data.
+    Parameters: None.
+    Returns: None.
+*/
+void MergeSortOption3() {
+    // Get the number of products in the ProductsTable.
+    int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); 
 
-	FILE *fpProducts = fopen("ProductsTable", "rb+");	//Pointer to ProductsTable
-    
-    //CreateSalesTable("Sales.csv");
-
+    // Open the ProductsTable and SalesTable files for reading and writing.
+    FILE *fpProducts = fopen("ProductsTable", "rb+");
     FILE *fpSales = fopen("SalesTable", "rb+");
 
-	if (fpProducts == NULL){
-		printf("Error opening the 'ProductsTable' File");
-		return;
-	}
-    if(fpSales == NULL){
-        printf("Error opening the 'SalesTable' File");
-        return;
+    // Check if files are successfully opened.
+    if (fpProducts == NULL) {
+        printf("Error opening the 'ProductsTable' File");
+        return; // Exit function if ProductsTable file can't be opened.
     }
-    
+    if (fpSales == NULL) {
+        printf("Error opening the 'SalesTable' File");
+        return; // Exit function if SalesTable file can't be opened.
+    }
 
-	MergeSortFile(fpProducts, 0, numRecordsProducts - 1, sizeof(Products), CompareProductsByProductKey);
+    // Perform MergeSort to sort ProductsTable by ProductKey.
+    MergeSortFile(fpProducts, 0, numRecordsProducts - 1, sizeof(Products), CompareProductsByProductKey);
 
+    // Call the function to print seasonal analysis using sales data from SalesTable.
+    PrintSeasonalAnalysis(fpSales);
 
-	PrintSeasonalAnalysis(fpSales);
-
+    // Close the file pointers after the operation is completed.
     fclose(fpProducts);
     fclose(fpSales);
 }
