@@ -184,12 +184,13 @@ void PrintSeasonalAnalysis(FILE *fpSales) {
 
 }
 
+
 void BubbleSortOption3(){
 	int numRecordsProducts = TellNumRecords("ProductsTable", sizeof(Products)); 	//Quantity of products in ProductsTable
 
 	FILE *fpProducts = fopen("ProductsTable", "rb+");	//Pointer to ProductsTable
     
-    CreateSalesTable("Sales.csv");
+    //CreateSalesTable("Sales.csv");
 
     FILE *fpSales = fopen("SalesTable", "rb+");
 
@@ -235,7 +236,7 @@ void MergeSortOption3(){
 
 	FILE *fpProducts = fopen("ProductsTable", "rb+");	//Pointer to ProductsTable
     
-    CreateSalesTable("Sales.csv");
+    //CreateSalesTable("Sales.csv");
 
     FILE *fpSales = fopen("SalesTable", "rb+");
 

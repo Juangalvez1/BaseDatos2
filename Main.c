@@ -1,7 +1,7 @@
 /*
-- Fecha de publicación: 
-- Hora de publicación: 
-- Versión de su código: 1.0
+- Fecha de publicación: 22/11/2024
+- Hora de publicación: 2:52 AM
+- Versión de su código: 5.2
 - Autor. Ing(c) Juan José Gálvez López
 - Nombre del lenguaje utilizado: C
 - Versión del lenguaje utilizado: C11
@@ -14,7 +14,9 @@
 - Un descriptivo de que hace el programa:
     
 - Salvedades:
-  Para pruebas hechas en otros sistemas operativos y/o otras versiones del lenguaje, no se garantizan resultados
+  No se garantiza su funcionamiento en otras versiones del sistema operativo, en otros sistemas operativos, en otras versiones del 
+  lenguaje, del compilador u otro compilador.
+  Primero se debe ejecutar la opcion 1 del menu, creando las tablas, asi mismo, esta debe de ejecutarse antes de cualquier otra opcion
 */
 
 #include <stdio.h>
